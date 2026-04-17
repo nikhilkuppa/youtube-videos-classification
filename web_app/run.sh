@@ -22,14 +22,14 @@ echo "Installing dependencies..."
 pip install -q -r requirements.txt
 
 # Check if metadata files exist
-if [ ! -f "../tsne_metadata/format/metadata_format.tsv" ]; then
+if [ ! -f "data/tsne_metadata/format/metadata_format.tsv" ]; then
     echo "WARNING: Format metadata file not found!"
-    echo "Expected: ../tsne_metadata/format/metadata_format.tsv"
+    echo "Expected: data/tsne_metadata/format/metadata_format.tsv"
 fi
 
-if [ ! -f "../tsne_metadata/content/metadata_content.tsv" ]; then
+if [ ! -f "data/tsne_metadata/content/metadata_content.tsv" ]; then
     echo "WARNING: Content metadata file not found!"
-    echo "Expected: ../tsne_metadata/content/metadata_content.tsv"
+    echo "Expected: data/tsne_metadata/content/metadata_content.tsv"
 fi
 
 echo ""

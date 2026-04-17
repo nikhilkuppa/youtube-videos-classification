@@ -7,8 +7,17 @@ web_app/
 ├── frontend/
 │   ├── index.html          # Main HTML interface
 │   └── app.js              # Canvas-based visualization engine
-├── requirements.txt        # Python dependencies
-└── README.md              # This file
+├── data/
+│   ├── format-map.tsv              # Format tag → display name mappings
+│   ├── content-map-with-unesco.tsv # Content tag → UNESCO mappings
+│   ├── edu_content_map.tsv         # Educational content mappings
+│   └── tsne_metadata/
+│       ├── format/
+│       │   └── metadata_format.tsv   # ~130k videos with format classification
+│       └── content/
+│           └── metadata_content.tsv  # ~140k videos with content classification
+├── .python-version         # Python 3.11.0 (used by Render)
+└── requirements.txt        # Python dependencies
 ```
 
 ## Quick Start
@@ -18,7 +27,7 @@ cd web_app
 bash run.sh
 ```
 
-## Step-by-step Run 
+## Step-by-step Run
 
 ### 1. Install Dependencies
 
@@ -31,7 +40,7 @@ pip install -r requirements.txt
 
 Ensure your metadata files exist:
 ```
-tsne_metadata/
+web_app/data/tsne_metadata/
 ├── format/
 │   └── metadata_format.tsv
 └── content/
@@ -56,9 +65,10 @@ cd web_app
 gunicorn -w 4 -b 0.0.0.0:5000 backend.api:app
 ```
 
-### Cloud Platform (Heroku, Railway, Render)
+### Cloud Platform (Render)
 
-1. Add a `Procfile`:
-```
-web: gunicorn -w 4 backend.api:app
-```
+Deployment is configured via `render.yaml` at the repo root:
+- `rootDir` is set to `./web_app`
+- Python version is pinned via `web_app/.python-version`
+- Build command: `pip install -r requirements.txt`
+- Start command: `gunicorn --workers 4 --bind 0.0.0.0:$PORT backend.api:app`

@@ -202,8 +202,7 @@ def load_metadata(classification='format'):
         logger.info(f"Using cached data for {classification}")
         return DATA_CACHE[cache_key]
 
-    base_path = Path(__file__).parent.parent.parent
-    metadata_path = base_path / 'tsne_metadata' / classification / f'metadata_{classification}.tsv'
+    metadata_path = Path(__file__).parent.parent / 'data' / 'tsne_metadata' / classification / f'metadata_{classification}.tsv'
 
     logger.info(f"Loading metadata from {metadata_path}")
 

@@ -1,0 +1,134 @@
+tag	map1	map2	map2.5	map3	mapUNESCO
+edu.arts.architecture:	arts	arts	arts_culture	edu	Architecture
+edu.arts.languages:	arts	arts	arts_culture	edu	Languages
+edu.arts.literature:	arts	arts		edu	Languages
+edu.arts.media:	arts	arts		edu	Arts
+edu.arts.performing:	arts	arts		edu	Arts
+edu.arts.visual:	arts	arts		edu	Arts
+edu.arts.writing:	arts	arts		edu	Languages
+edu.arts.music:	arts	arts		edu	Arts
+edu.arts.arthistory:	arts	arts		edu	Arts
+edu.arts.acting:	arts	arts		edu	Arts
+edu.social.anthropology:	history	history		edu	Social Sciences
+edu.social.archaeology:	history	history		edu	Humanities
+edu.social.history:	history	history		edu	Humanities
+edu.social.law:	law	law		edu	Law
+edu.social.politics:	politics	politics		edu	Social Sciences
+edu.social.psychology:	psychology	psychology		edu	Social Sciences
+edu.social.sociology:	sociology	sociology		edu	Social Sciences
+edu.humanities.ethics:	humanities	humanities		edu	Humanities
+edu.humanities.philosophy:	humanities	humanities		edu	Humanities
+edu.humanities.religion:	humanities	humanities		edu	Humanities
+edu.business.economics:	economics	economics		edu	Business
+edu.business.entrepreneurship:	business	business		edu	Business 
+edu.business.finance:	finance	finance		edu	Business 
+edu.business.management:	business	business		edu	Business 
+edu.business.marketing:	business	business		edu	Business 
+edu.business.analytics:	business	business		edu	Mathematics 
+edu.education.pedagogy.teachingprinciples:	teaching	teaching		edu	Education
+edu.education.pedagogy.teachingtools:	teaching	teaching		edu	Education
+edu.medicine.dentistry:	medicine	medicine		edu	Health
+edu.medicine.nursing:	medicine	medicine		edu	Health
+edu.medicine.pharmacy:	medicine	medicine		edu	Health
+edu.medicine.surgery:	medicine	medicine		edu	Health
+edu.medicine.internalmedicine:	medicine	medicine		edu	Health
+edu.medicine.psychiatry:	medicine	medicine		edu	Health
+edu.medicine.physiology:	medicine	medicine		edu	Health
+edu.medicine.cardiology:	medicine	medicine		edu	Health
+edu.medicine.neurology:	medicine	medicine		edu	Health
+edu.medicine.radiology:	medicine	medicine		edu	Health
+edu.medicine.gastroenterology:	medicine	medicine		edu	Health
+edu.medicine.orthopedics:	medicine	medicine		edu	Health
+edu.medicine.pediatrics:	medicine	medicine		edu	Health
+edu.medicine.rheumatology:	medicine	medicine		edu	Health
+edu.medicine.oncology:	medicine	medicine		edu	Health
+edu.medicine.nephrology:	medicine	medicine		edu	Health
+edu.medicine.endocrinology:	medicine	medicine		edu	Health
+edu.medicine.haematology:	medicine	medicine		edu	Health
+edu.medicine.immunology:	medicine	medicine		edu	Health
+edu.medicine.respiratory:	medicine	medicine		edu	Health
+edu.medicine.publichealth:	public_health	public_health		edu	Health
+edu.medicine.other:	medicine	medicine		edu	Health
+edu.stem.biology.botany:	biology	biology		edu	Biological Sciences
+edu.stem.biology.ecology:	biology	biology		edu	Environment
+edu.stem.biology.genetics:	biology	biology		edu	Biological Sciences
+edu.stem.biology.marinebiology:	biology	biology		edu	Physical Sciences
+edu.stem.biology.microbiology:	biology	biology		edu	Biological Sciences
+edu.stem.biology.molecularbiology:	biology	biology		edu	Biological Sciences
+edu.stem.biology.zoology:	biology	biology		edu	Biological Sciences
+edu.stem.biology.cellbiology:	biology	biology		edu	Biological Sciences
+edu.stem.biology.evolutionarybiology:	biology	biology		edu	Biological Sciences
+edu.stem.biology.genomics:	biotech	biotech		edu	Biological Sciences
+edu.stem.biology.biophysics:	biology	biology		edu	Physical Sciences
+edu.stem.biology.bioinformatics:	biotech	biotech		edu	Biological Sciences
+edu.stem.biology.other:	biology	biology		edu	Biological Sciences
+edu.stem.biotechnology:	biotech	biotech		edu	Biological Sciences
+edu.stem.chemistry.analytical:	chemistry	chemistry		edu	Physical Sciences
+edu.stem.chemistry.biochemistry:	chemistry	chemistry		edu	Biological Sciences
+edu.stem.chemistry.inorganic:	chemistry	chemistry		edu	Physical Sciences
+edu.stem.chemistry.organic:	chemistry	chemistry		edu	Physical Sciences
+edu.stem.chemistry.physical:	chemistry	chemistry		edu	Physical Sciences
+edu.stem.chemistry.materials:	chemistry	chemistry		edu	Manufacturing 
+edu.stem.chemistry.nanotechnology:	chemistry	chemistry		edu	Engineering
+edu.stem.chemistry.other:	chemistry	chemistry		edu	Physical Sciences
+edu.stem.physics.electromagnetism:	physics	physics		edu	Physical Sciences
+edu.stem.physics.mechanics:	physics	physics		edu	Physical Sciences
+edu.stem.physics.thermodynamics:	physics	physics		edu	Physical Sciences
+edu.stem.physics.quantum:	physics	physics		edu	Physical Sciences
+edu.stem.physics.relativity:	physics	physics		edu	Physical Sciences
+edu.stem.physics.optics:	physics	physics		edu	Physical Sciences
+edu.stem.physics.acoustics:	physics	physics		edu	Physical Sciences
+edu.stem.physics.nuclearphysics:	physics	physics		edu	Physical Sciences
+edu.stem.physics.computationalphysics:	physics	physics		edu	Physical Sciences
+edu.stem.physics.matter:	physics	physics		edu	Physical Sciences
+edu.stem.physics.particle:	physics	physics		edu	Physical Sciences
+edu.stem.physics.other:	physics	physics		edu	Physical Sciences
+edu.stem.engineering.aerospace:	engineering	engineering		edu	Engineering
+edu.stem.engineering.biomedical:	engineering	engineering		edu	Engineering
+edu.stem.engineering.chemical:	engineering	engineering		edu	Engineering
+edu.stem.engineering.computerscience:	computersci	computersci		edu	Information Technologies
+edu.stem.engineering.datascience:	datasci	datasci		edu	Information Technologies
+edu.stem.engineering.electrical:	engineering	engineering		edu	Engineering
+edu.stem.engineering.electronics:	engineering	engineering		edu	Engineering
+edu.stem.engineering.mechanical:	engineering	engineering		edu	Engineering
+edu.stem.engineering.civil:	engineering	engineering		edu	Architecture
+edu.stem.engineering.environmental:	engineering	engineering		edu	Engineering
+edu.stem.engineering.marine:	engineering	engineering		edu	Engineering
+edu.stem.engineering.nuclear:	engineering	engineering		edu	Engineering
+edu.stem.engineering.industrial:	engineering	engineering		edu	Engineering
+edu.stem.engineering.materials:	engineering	engineering		edu	Manufacturing
+edu.stem.engineering.robotics:	engineering	engineering		edu	Engineering
+edu.stem.engineering.automotive:	engineering	engineering		edu	Engineering
+edu.stem.engineering.sustainability:	engineering	engineering		edu	Engineering
+edu.stem.engineering.telecommunications:	engineering	engineering		edu	Engineering
+edu.stem.engineering.agricultural:	engineering	engineering		edu	Engineering
+edu.stem.engineering.energy:	engineering	engineering		edu	Engineering
+edu.stem.engineering.systemsengineering:	engineering	engineering		edu	Engineering
+edu.stem.engineering.other:	engineering	engineering		edu	Engineering
+edu.stem.math.algebra:	algebra	algebra		edu	Mathematics
+edu.stem.math.calculus:	math	math		edu	Mathematics
+edu.stem.math.geometry:	math	math		edu	Mathematics
+edu.stem.math.statistics:	datasci	datasci		edu	Mathematics
+edu.stem.math.arithmetic:	math	math		edu	Mathematics
+edu.stem.math.trigonometry:	math	math		edu	Mathematics
+edu.stem.math.numbertheory:	math	math		edu	Mathematics
+edu.stem.math.probability:	datasci	datasci		edu	Mathematics
+edu.stem.math.topology:	math	math		edu	Mathematics
+edu.stem.math.combinatorics:	math	math		edu	Mathematics
+edu.stem.math.linearalgebra:	datasci	datasci		edu	Mathematics
+edu.stem.math.gametheory:	math	math		edu	Mathematics
+edu.stem.math.settheory:	math	math		edu	Mathematics
+edu.stem.math.differentialeqns:	math	math		edu	Mathematics
+edu.stem.math.logic:	math	math		edu	Mathematics
+edu.stem.math.other:	math	math		edu	Mathematics
+edu.stem.environment:	environment	environment		edu	Environment
+edu.stem.astronomy:	astronomy	astronomy		edu	Physical Sciences
+edu.stem.neuroscience:	neurosci	neurosci		edu	Biological Sciences
+skills.digital.coding:	computersci	computersci		edu	Information Technologies
+skills.financial.personalfinance:	computersci	computersci		edu	Business
+language.teachinglanguage:	computersci	computersci		edu	Languages
+language.internationallanguage:	computersci	computersci		edu	Languages
+
+
+	
+

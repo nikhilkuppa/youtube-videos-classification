@@ -52,15 +52,12 @@ def load_label_maps():
     if LABEL_MAPS:
         return LABEL_MAPS
 
-    # Project root is 5 levels up from this file:
-    # api.py → backend/ → web_app/ → code/ → tsne_data_reduction/ → youtube_project/
-    project_path = Path(__file__).parent.parent.parent.parent.parent
+    # Label map files are bundled in web_app/data/
+    data_path = Path(__file__).parent.parent / "data"
 
     try:
         # Educational content: mapUNESCO column from edu_content_map.tsv
-        edu_df = pd.read_csv(
-            project_path / "classify_content/input/edu_content_map.tsv", sep='\t'
-        )
+        edu_df = pd.read_csv(data_path / "edu_content_map.tsv", sep='\t')
         edu_map = {}
         for _, row in edu_df.iterrows():
             tag = str(row.get('tag', '')).strip().rstrip(':')
@@ -70,9 +67,7 @@ def load_label_maps():
         LABEL_MAPS['edu'] = edu_map
 
         # Non-educational content: map2 column from content-map-with-unesco.tsv
-        content_df = pd.read_csv(
-            project_path / "classify_content/input/content-map-with-unesco.tsv", sep='\t'
-        )
+        content_df = pd.read_csv(data_path / "content-map-with-unesco.tsv", sep='\t')
         content_map = {}
         for _, row in content_df.iterrows():
             tag = str(row.get('tag', '')).strip().rstrip(':')
@@ -82,9 +77,7 @@ def load_label_maps():
         LABEL_MAPS['content'] = content_map
 
         # Format: map2 column from format-map.tsv
-        fmt_df = pd.read_csv(
-            project_path / "classify_format/input/format-map.tsv", sep='\t'
-        )
+        fmt_df = pd.read_csv(data_path / "format-map.tsv", sep='\t')
         fmt_map = {}
         for _, row in fmt_df.iterrows():
             tag = str(row.get('tag', '')).strip()
@@ -391,4 +384,5 @@ if __name__ == '__main__':
     load_metadata('content')
     finalize_cross_labels()
 
-    app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)

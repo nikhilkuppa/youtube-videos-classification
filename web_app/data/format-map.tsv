@@ -1,0 +1,37 @@
+tag	map1	map2	map2.5	map3
+talkinghead.framecorner	presenter-corner	presenter	Talking Head	presenter
+talkinghead.frameregular	presenter-center	presenter	Talking Head	presenter
+board.chalkboard	chalkboard	writingboard	Writing Board	writingboard
+board.whiteboard	whiteboard	writingboard	Writing Board	writingboard
+board.lightboard	glassboard	writingboard	Writing Board	writingboard
+writing.stylus	writing-cursor	writingboard	Writing Cursor	writingboard
+keystrokes	typing	screen	Screencasts	screencast
+writing.hand	writing-hand	writinghand	Writing Hand	writinghand
+animated.info	animation-infographic	graphics	Infographics	animation
+animated.cartoon	animation-cartoon	cartoon	Animations	animation
+crafts.cutouts	animation-cutouts	cutouts	Animations	animation
+animated.graphics	animation-graphics	graphics	Infographics	animation
+animated.comic	animation-comic	cartoon	Animations	animation
+animation.powerpoint	animation-powerpoint	graphics	Slidedecks	animation
+classroom	classroom	classroom	Lectures	lecture
+screencast	screenrecord	screen	Screencasts	screencast
+slides	powerpoint-slides	slides	Slidedecks	slidedeck
+docustyle	documentary	documentary	Documentaries	documentary
+paneldiscussion.inperson	paneldiscussion-inperson	paneldiscussion	Panel	discussion
+paneldiscussion.virtual	paneldiscussion-virtual	paneldiscussion	Panel	discussion
+persononstage	presenter-onstage	stage	Stage Talks	lecture
+conversation.casual	talkshows	conversation	Interviews	discussion
+conversation.podcast	podcast	conversation	Interviews	discussion
+conversation.formal	formal-interview	conversation	Interviews	discussion
+interview.street	street-interview	interview	Interviews	discussion
+surveillancefootage	surveillancecam	homecamera	Others	homecamera
+gaming	gaming	gaming	Gaming	gaming
+pov.realworld	firstperson-pov	vlog	Vlog	vlog
+skit	skit	skit	Skit	skit
+vlog	vlog	vlog	Vlog	vlog
+practicaldemonstration.cooking	cooking	cooking	Demonstrations	experiments
+practicaldemonstration.engineering	experiments-engineering	experiments	Demonstrations	experiments
+practicaldemonstration.science	experiments-science	experiments	Demonstrations	experiments
+dance	dance	dance	Others	dance
+placeholderdisplay	static-screen	static-screen	Others	static-screen
+rawfootage	unedited	homecamera	Others	homecamera

@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Attention Trap in Online Education Videos</title>
     <style>
+        :root {
+            /* Three deliberate stacks instead of one generic system list:
+               serif for the paper's own voice (title), sans for UI chrome,
+               mono for anything numeric (counts, stats) - a small nod to a
+               lab-instrument register rather than a SaaS dashboard. No
+               accent color: the only color in this app is the data itself,
+               so the interface stays entirely on a gray scale. */
+            --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+            --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+            --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,7 +26,7 @@
         body {
             background-color: #000000;
             color: #e0e0e0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: var(--font-sans);
             overflow: hidden;
         }
 
@@ -42,20 +54,22 @@
 
         .header-text {
             min-width: 0;
+            border-top: 1px solid #2a2a2a;
+            padding-top: 7px;
         }
 
         .eyebrow {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 1.6px;
-            text-transform: uppercase;
-            color: #6a6a6a;
-            margin-bottom: 4px;
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 11.5px;
+            color: #767676;
+            margin-bottom: 3px;
         }
 
         .title {
-            font-size: 18px;
-            font-weight: 500;
+            font-family: var(--font-serif);
+            font-size: 19px;
+            font-weight: 600;
             letter-spacing: 0.1px;
             color: #f2f2f2;
             white-space: nowrap;
@@ -74,6 +88,10 @@
 
         .byline .sep {
             color: #444;
+        }
+
+        #video-count {
+            font-family: var(--font-mono);
         }
 
         .byline a {
@@ -107,7 +125,7 @@
             border-radius: 5px;
             font-size: 13px;
             font-weight: 500;
-            transition: all 0.15s;
+            transition: background 0.15s, color 0.15s;
         }
 
         .toggle-btn.active {
@@ -152,35 +170,44 @@
             height: 100%;
         }
 
+        /* One joined bar, same visual language as the classification
+           toggle, instead of three separate floating glass pills. */
         .controls {
             position: absolute;
             top: 20px;
             right: 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 7px;
+            overflow: hidden;
             z-index: 100;
         }
 
         .control-btn {
-            width: 40px;
-            height: 40px;
-            background: rgba(30, 30, 30, 0.9);
-            border: 1px solid #444;
-            border-radius: 8px;
-            color: white;
-            font-size: 20px;
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #222;
+            color: #999;
+            font-family: var(--font-mono);
+            font-size: 15px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background 0.15s, color 0.15s;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        .control-btn:last-child {
+            border-bottom: none;
+        }
+
         .control-btn:hover {
-            background: rgba(50, 50, 50, 0.9);
-            border-color: #00d4ff;
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+            background: #1e1e1e;
+            color: #fff;
         }
 
         .info-panel {
@@ -263,12 +290,14 @@
         }
 
         .metadata-value a {
-            color: #00d4ff;
+            color: #ccc;
             text-decoration: none;
+            border-bottom: 1px solid #444;
         }
 
         .metadata-value a:hover {
-            text-decoration: underline;
+            color: #fff;
+            border-color: #999;
         }
 
         .badge-row {
@@ -277,14 +306,15 @@
             gap: 6px;
         }
 
+        /* Plain text chip, not a filled pill - the legend is where color
+           actually means something; here it would just be decoration. */
         .category-badge {
             display: inline-block;
-            padding: 4px 12px;
-            background: rgba(0, 212, 255, 0.2);
-            border: 1px solid rgba(0, 212, 255, 0.4);
-            border-radius: 20px;
-            font-size: 12px;
-            color: #00d4ff;
+            padding: 2px 9px;
+            border: 1px solid #3a3a3a;
+            border-radius: 3px;
+            font-size: 11.5px;
+            color: #ccc;
         }
 
         .tag-path-list {
@@ -329,9 +359,10 @@
         }
 
         .stat-value {
+            font-family: var(--font-mono);
             font-size: 16px;
             font-weight: 600;
-            color: #00d4ff;
+            color: #f0f0f0;
         }
 
         .stat-label {
@@ -350,12 +381,12 @@
         }
 
         .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid #333;
-            border-top-color: #00d4ff;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #2a2a2a;
+            border-top-color: #ccc;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.9s linear infinite;
         }
 
         @keyframes spin {
@@ -393,8 +424,7 @@
 
         .search-input:focus {
             outline: none;
-            border-color: #00d4ff;
-            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+            border-color: #777;
         }
 
         .video-count {
@@ -460,6 +490,7 @@
         }
 
         .legend-count {
+            font-family: var(--font-mono);
             color: #666;
             font-size: 11px;
         }
@@ -505,6 +536,7 @@
         }
 
         .legend-tooltip-count {
+            font-family: var(--font-mono);
             color: #777;
         }
     </style>
@@ -514,7 +546,7 @@
         <div class="header">
             <div class="header-content">
                 <div class="header-text">
-                    <div class="eyebrow">Companion Visualization</div>
+                    <div class="eyebrow">Interactive companion to the paper</div>
                     <div class="title">The Attention Trap in Online Education Videos</div>
                     <div class="byline">
                         <span>Nikhil Kuppa, Melanie Adler, Lucas C. Parra, Jens Madsen</span>

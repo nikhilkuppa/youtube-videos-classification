@@ -512,12 +512,17 @@ class TSNEVisualization {
         }
 
         if (this.selectedPoint) {
+            // Double ring (vs. hover's single ring) reads as "locked in"
+            // without needing a second accent color.
             const [x, y] = this.projectToCanvas(this.xs[this.selectedPoint.index], this.ys[this.selectedPoint.index]);
             ctx.globalAlpha = 1;
-            ctx.strokeStyle = '#00d4ff';
-            ctx.lineWidth = 3 / this.scale;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5 / this.scale;
             ctx.beginPath();
-            ctx.arc(x, y, (dotRadius + 5 / this.scale), 0, Math.PI * 2);
+            ctx.arc(x, y, (dotRadius + 3 / this.scale), 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x, y, (dotRadius + 7 / this.scale), 0, Math.PI * 2);
             ctx.stroke();
         }
 

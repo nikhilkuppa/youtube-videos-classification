@@ -9,6 +9,7 @@ a Python dict - a dict of ~270k rich records measured over 1GB RSS in this
 process, which is what exceeded Render's 512MB instance limit. Only a small
 id -> row-index map (used to find a point's x/y for search) stays resident.
 """
+import hashlib
 import json
 import logging
 import os
@@ -71,8 +72,8 @@ def load_classification(classification: str):
     logger.info(f"Loading precomputed data for {classification} ...")
 
     coords_bytes = bin_path.read_bytes()
-    with open(cat_path, encoding='utf-8') as f:
-        categories = json.load(f)
+    categories_bytes = cat_path.read_bytes()
+    categories = json.loads(categories_bytes)
 
     count = len(coords_bytes) // RECORD_SIZE
 
@@ -87,7 +88,10 @@ def load_classification(classification: str):
 
     DATA_CACHE[classification] = {
         'coords_bytes': coords_bytes,
+        'coords_etag': hashlib.md5(coords_bytes).hexdigest(),
         'categories': categories,
+        'categories_bytes': categories_bytes,
+        'categories_etag': hashlib.md5(categories_bytes).hexdigest(),
         'db_path': db_path,
         'db': None,  # opened lazily, per worker process - see db_for()
         'id_index': id_index,
@@ -136,22 +140,32 @@ def get_coordinates(classification):
     if data is None:
         return jsonify({'error': f'Classification {classification} not found'}), 404
 
+    # Conditional caching instead of a blind long-lived cache: an
+    # `immutable`/1-year Cache-Control here previously meant that once this
+    # data changed (e.g. adding the subcategory breakdown), every browser
+    # that had already loaded the page kept serving its stale cached copy
+    # forever, with no way to pick up the update short of a hard-refresh.
+    # An ETag lets the browser cheaply re-check on each load and only
+    # re-download the ~2-3MB payload when it actually changed.
     resp = Response(data['coords_bytes'], mimetype='application/octet-stream')
-    resp.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+    resp.headers['Cache-Control'] = 'public, max-age=0, must-revalidate'
     resp.headers['X-Point-Count'] = str(data['count'])
-    return resp
+    resp.set_etag(data['coords_etag'])
+    return resp.make_conditional(request)
 
 
 @app.route('/api/categories/<classification>')
 def get_categories(classification):
-    """Palette + legend + centroids (small, fine to cache aggressively)."""
+    """Palette + legend + centroids (small; ETag so updates aren't stuck
+    behind a stale cache - see get_coordinates for why)."""
     data = load_classification(classification)
     if data is None:
         return jsonify({'error': f'Classification {classification} not found'}), 404
 
-    resp = jsonify(data['categories'])
-    resp.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
-    return resp
+    resp = Response(data['categories_bytes'], mimetype='application/json')
+    resp.headers['Cache-Control'] = 'public, max-age=0, must-revalidate'
+    resp.set_etag(data['categories_etag'])
+    return resp.make_conditional(request)
 
 
 @app.route('/api/metadata/<classification>/<video_id>')

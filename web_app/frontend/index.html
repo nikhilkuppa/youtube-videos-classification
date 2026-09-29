@@ -43,16 +43,18 @@
             border-bottom: 1px solid #1c1c1c;
         }
 
-        /* Right edge sits at the same 20px inset as .panel-section below
-           (the legend's right edge / scrollbar), instead of the old
-           1400px-centered box that only lined up by coincidence at some
-           widths. Left edge keeps the original 30px header padding. */
+        /* Flush to the viewport's right edge, same as .info-panel's own
+           right edge below it (.info-panel has no padding of its own -
+           .panel-section's 20px padding is inside it - so .info-panel's
+           scrollbar, when it has one, renders right at that flush edge,
+           not 20px in from it. Content's right edge lines up with that.
+           Left edge keeps the original 30px header padding. */
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 24px;
-            padding: 0 20px 0 30px;
+            padding: 0 0 0 30px;
         }
 
         .header-text {

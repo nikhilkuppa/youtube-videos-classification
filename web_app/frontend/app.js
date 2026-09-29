@@ -178,9 +178,16 @@ class TSNEVisualization {
         try {
             document.getElementById('loading').style.display = 'block';
 
+            // cache: 'no-cache' forces a real revalidation request every
+            // load instead of trusting a previously cached response's
+            // freshness - needed once, since these URLs were briefly served
+            // with an `immutable` Cache-Control and some browsers will
+            // honor that forever otherwise, never re-checking even after
+            // the server starts sending correct ETags. Cheap: the server
+            // still answers with a 304 when nothing actually changed.
             const [coordsResp, catsResp] = await Promise.all([
-                fetch(`${API_BASE}/api/coordinates/${classification}`),
-                fetch(`${API_BASE}/api/categories/${classification}`),
+                fetch(`${API_BASE}/api/coordinates/${classification}`, { cache: 'no-cache' }),
+                fetch(`${API_BASE}/api/categories/${classification}`, { cache: 'no-cache' }),
             ]);
 
             const buffer = await coordsResp.arrayBuffer();

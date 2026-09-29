@@ -1,0 +1,146 @@
+[
+  {
+    "id": 0,
+    "name": "Talking Head",
+    "colorHex": "#e6194b",
+    "count": 43023,
+    "centroidX": 25.41059,
+    "centroidY": 49.812317
+  },
+  {
+    "id": 1,
+    "name": "Documentaries",
+    "colorHex": "#3cb44b",
+    "count": 18942,
+    "centroidX": -18.121045000000002,
+    "centroidY": -16.344354
+  },
+  {
+    "id": 2,
+    "name": "Infographics",
+    "colorHex": "#4363d8",
+    "count": 11399,
+    "centroidX": -64.82154,
+    "centroidY": 33.58807
+  },
+  {
+    "id": 3,
+    "name": "Writing Cursor",
+    "colorHex": "#911eb4",
+    "count": 10085,
+    "centroidX": -95.45502,
+    "centroidY": -37.55864
+  },
+  {
+    "id": 4,
+    "name": "Interviews",
+    "colorHex": "#f58231",
+    "count": 9957,
+    "centroidX": 68.12272,
+    "centroidY": 12.341254
+  },
+  {
+    "id": 5,
+    "name": "Stage Talks",
+    "colorHex": "#46f0f0",
+    "count": 6640,
+    "centroidX": 72.845875,
+    "centroidY": -39.57209
+  },
+  {
+    "id": 6,
+    "name": "Demonstrations",
+    "colorHex": "#f032e6",
+    "count": 5587,
+    "centroidX": -1.5911984,
+    "centroidY": -95.61164
+  },
+  {
+    "id": 7,
+    "name": "Lectures",
+    "colorHex": "#bcf60c",
+    "count": 3481,
+    "centroidX": 63.14892,
+    "centroidY": -73.60092
+  },
+  {
+    "id": 8,
+    "name": "Animations",
+    "colorHex": "#fabebe",
+    "count": 3360,
+    "centroidX": -107.1298755,
+    "centroidY": 46.6861375
+  },
+  {
+    "id": 9,
+    "name": "Skit",
+    "colorHex": "#008080",
+    "count": 2970,
+    "centroidX": 20.882627,
+    "centroidY": -72.25889000000001
+  },
+  {
+    "id": 10,
+    "name": "Screencasts",
+    "colorHex": "#9a6324",
+    "count": 2629,
+    "centroidX": -67.59012,
+    "centroidY": 24.48831
+  },
+  {
+    "id": 11,
+    "name": "Gaming",
+    "colorHex": "#800000",
+    "count": 2616,
+    "centroidX": -64.501935,
+    "centroidY": -76.62303499999999
+  },
+  {
+    "id": 12,
+    "name": "Others",
+    "colorHex": "#808080",
+    "count": 2472,
+    "centroidX": -16.758483,
+    "centroidY": -101.67069
+  },
+  {
+    "id": 13,
+    "name": "Writing Board",
+    "colorHex": "#e6beff",
+    "count": 2362,
+    "centroidX": 46.270611,
+    "centroidY": -76.01651
+  },
+  {
+    "id": 14,
+    "name": "Slidedecks",
+    "colorHex": "#aaffc3",
+    "count": 1867,
+    "centroidX": 22.048672,
+    "centroidY": -14.913106
+  },
+  {
+    "id": 15,
+    "name": "Panel",
+    "colorHex": "#ffd700",
+    "count": 1201,
+    "centroidX": 65.408806,
+    "centroidY": 29.242075
+  },
+  {
+    "id": 16,
+    "name": "Writing Hand",
+    "colorHex": "#ff6f61",
+    "count": 767,
+    "centroidX": -67.35612,
+    "centroidY": -17.068394
+  },
+  {
+    "id": 17,
+    "name": "Vlog",
+    "colorHex": "#6c5ce7",
+    "count": 685,
+    "centroidX": -20.35703,
+    "centroidY": -29.658815
+  }
+]

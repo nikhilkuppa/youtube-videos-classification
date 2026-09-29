@@ -1,9 +1,23 @@
 /**
- * High-performance t-SNE visualization using Canvas and spatial indexing
- * Handles 100k+ points efficiently with lazy metadata loading
+ * High-performance t-SNE visualization using Canvas and spatial indexing.
+ *
+ * Coordinates are fetched as a packed binary buffer (11-byte id + float32 x
+ * + float32 y + uint8 category_id per point) and read into typed arrays -
+ * no JSON parsing of 100k+ point objects. Category colors/names are a small
+ * fixed palette fetched separately and looked up by id.
  */
 
 const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5000' : '';
+const RECORD_SIZE = 20; // 11s + f + f + B
+
+function hexToRgb(hex) {
+    hex = hex.replace('#', '');
+    return [
+        parseInt(hex.substring(0, 2), 16),
+        parseInt(hex.substring(2, 4), 16),
+        parseInt(hex.substring(4, 6), 16),
+    ];
+}
 
 class SpatialIndex {
     constructor(gridSize = 50) {
@@ -43,7 +57,6 @@ class SpatialIndex {
             }
         }
 
-        // Find closest point within radius
         let closest = null;
         let minDist = radius;
 
@@ -69,8 +82,15 @@ class TSNEVisualization {
         this.container = document.getElementById('canvas-container');
 
         // State
-        this.data = null;
         this.classification = 'format';
+        this.pointCount = 0;
+        this.ids = null;       // string[]
+        this.xs = null;        // Float32Array
+        this.ys = null;        // Float32Array
+        this.catIds = null;    // Uint8Array
+        this.categories = [];  // [{id, name, colorHex, colorRGB, count, centroidX, centroidY}]
+        this.bounds = null;
+
         this.scale = 1;
         this.translateX = 0;
         this.translateY = 0;
@@ -79,6 +99,7 @@ class TSNEVisualization {
         this.lastMouseY = 0;
         this.hoveredPoint = null;
         this.selectedPoint = null;
+        this.highlightCategoryId = null; // set while hovering a legend item
 
         // Performance
         this.spatialIndex = new SpatialIndex(50);
@@ -86,10 +107,11 @@ class TSNEVisualization {
         this.renderRequested = false;
 
         // Constants
-        this.DOT_RADIUS = 3;
+        this.DOT_RADIUS = 2.5;
         this.HOVER_RADIUS = 15;
         this.MIN_SCALE = 0.3;
         this.MAX_SCALE = 10;
+        this.LABEL_MIN_SCALE = 1.3;
 
         this.init();
     }
@@ -110,6 +132,7 @@ class TSNEVisualization {
             this.canvas.style.width = rect.width + 'px';
             this.canvas.style.height = rect.height + 'px';
 
+            this.ctx.setTransform(1, 0, 0, 1, 0, 0);
             this.ctx.scale(dpr, dpr);
 
             this.canvasWidth = rect.width;
@@ -123,7 +146,6 @@ class TSNEVisualization {
     }
 
     setupEventListeners() {
-        // Mouse events for pan and zoom
         this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
         this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
         this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
@@ -131,12 +153,10 @@ class TSNEVisualization {
         this.canvas.addEventListener('wheel', this.handleWheel.bind(this));
         this.canvas.addEventListener('click', this.handleClick.bind(this));
 
-        // Controls
         document.getElementById('zoom-in').addEventListener('click', () => this.zoom(1.3));
         document.getElementById('zoom-out').addEventListener('click', () => this.zoom(0.7));
         document.getElementById('reset-view').addEventListener('click', () => this.resetView());
 
-        // Classification toggle
         document.querySelectorAll('.toggle-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const classification = e.target.dataset.classification;
@@ -146,7 +166,6 @@ class TSNEVisualization {
             });
         });
 
-        // Search
         const searchInput = document.getElementById('search-input');
         let searchTimeout;
         searchInput.addEventListener('input', (e) => {
@@ -159,22 +178,25 @@ class TSNEVisualization {
         try {
             document.getElementById('loading').style.display = 'block';
 
-            const response = await fetch(`${API_BASE}/api/coordinates/${classification}`);
-            const data = await response.json();
+            const [coordsResp, catsResp] = await Promise.all([
+                fetch(`${API_BASE}/api/coordinates/${classification}`),
+                fetch(`${API_BASE}/api/categories/${classification}`),
+            ]);
 
-            this.data = data;
+            const buffer = await coordsResp.arrayBuffer();
+            const categories = await catsResp.json();
+
+            this.parseBuffer(buffer);
+            this.categories = categories.map(c => ({ ...c, colorRGB: hexToRgb(c.colorHex) }));
             this.classification = classification;
 
-            // Update UI
-            document.getElementById('video-count').textContent = `${data.count.toLocaleString()} videos`;
+            document.getElementById('video-count').textContent = `${this.pointCount.toLocaleString()} videos`;
             document.querySelectorAll('.toggle-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.classification === classification);
             });
 
-            // Build spatial index
+            this.renderLegend();
             this.buildSpatialIndex();
-
-            // Reset view
             this.resetView();
 
             document.getElementById('loading').style.display = 'none';
@@ -184,30 +206,82 @@ class TSNEVisualization {
         }
     }
 
-    buildSpatialIndex() {
-        this.spatialIndex.clear();
+    /** Parse the packed binary buffer into typed arrays (structure-of-arrays). */
+    parseBuffer(buffer) {
+        const n = Math.floor(buffer.byteLength / RECORD_SIZE);
+        this.pointCount = n;
+        this.ids = new Array(n);
+        this.xs = new Float32Array(n);
+        this.ys = new Float32Array(n);
+        this.catIds = new Uint8Array(n);
 
-        if (!this.data || !this.data.coordinates) return;
+        const bytes = new Uint8Array(buffer);
+        const view = new DataView(buffer);
+        const decoder = new TextDecoder('ascii');
 
-        const { coordinates } = this.data;
+        let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
 
-        coordinates.forEach(point => {
-            const [x, y] = this.projectToCanvas(point.x, point.y);
-            this.spatialIndex.insert(point, x, y);
+        for (let i = 0; i < n; i++) {
+            const off = i * RECORD_SIZE;
+            this.ids[i] = decoder.decode(bytes.subarray(off, off + 11));
+            const x = view.getFloat32(off + 11, true);
+            const y = view.getFloat32(off + 15, true);
+            this.xs[i] = x;
+            this.ys[i] = y;
+            this.catIds[i] = view.getUint8(off + 19);
+
+            if (x < xMin) xMin = x;
+            if (x > xMax) xMax = x;
+            if (y < yMin) yMin = y;
+            if (y > yMax) yMax = y;
+        }
+
+        this.bounds = { x_min: xMin, x_max: xMax, y_min: yMin, y_max: yMax };
+    }
+
+    renderLegend() {
+        const container = document.getElementById('legend-list');
+        const sorted = [...this.categories].sort((a, b) => b.count - a.count);
+        container.innerHTML = sorted.map(c => `
+            <div class="legend-item" data-category-id="${c.id}">
+                <span class="legend-swatch" style="background:${c.colorHex}"></span>
+                <span class="legend-name">${this.escapeHtml(c.name)}</span>
+                <span class="legend-count">${c.count.toLocaleString()}</span>
+            </div>
+        `).join('');
+
+        container.querySelectorAll('.legend-item').forEach(el => {
+            const catId = parseInt(el.dataset.categoryId, 10);
+            el.addEventListener('mouseenter', () => {
+                this.highlightCategoryId = catId;
+                this.requestRender();
+            });
+            el.addEventListener('mouseleave', () => {
+                this.highlightCategoryId = null;
+                this.requestRender();
+            });
         });
     }
 
-    projectToCanvas(x, y) {
-        if (!this.data) return [0, 0];
+    buildSpatialIndex() {
+        this.spatialIndex.clear();
+        if (!this.pointCount) return;
 
-        const { bounds } = this.data;
+        for (let i = 0; i < this.pointCount; i++) {
+            const [x, y] = this.projectToCanvas(this.xs[i], this.ys[i]);
+            this.spatialIndex.insert({ index: i }, x, y);
+        }
+    }
+
+    projectToCanvas(x, y) {
+        if (!this.bounds) return [0, 0];
 
         const margin = 50;
         const plotWidth = this.canvasWidth - 2 * margin;
         const plotHeight = this.canvasHeight - 2 * margin;
 
-        const normalizedX = (x - bounds.x_min) / (bounds.x_max - bounds.x_min);
-        const normalizedY = (y - bounds.y_min) / (bounds.y_max - bounds.y_min);
+        const normalizedX = (x - this.bounds.x_min) / (this.bounds.x_max - this.bounds.x_min);
+        const normalizedY = (y - this.bounds.y_min) / (this.bounds.y_max - this.bounds.y_min);
 
         const canvasX = margin + normalizedX * plotWidth;
         const canvasY = this.canvasHeight - (margin + normalizedY * plotHeight);
@@ -236,75 +310,108 @@ class TSNEVisualization {
 
     render() {
         this.renderRequested = false;
-
-        if (!this.data) return;
+        if (!this.pointCount) return;
 
         const ctx = this.ctx;
-        const { coordinates, categories } = this.data;
 
-        // Clear canvas
-        ctx.fillStyle = '#0a0a0a';
+        ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
         ctx.save();
-
-        // Apply transformations
         ctx.translate(this.translateX, this.translateY);
         ctx.scale(this.scale, this.scale);
 
-        // Calculate visible bounds for culling
         const [minWorldX, minWorldY] = this.screenToWorld(0, 0);
         const [maxWorldX, maxWorldY] = this.screenToWorld(this.canvasWidth, this.canvasHeight);
 
-        // Render points
         const dotRadius = this.DOT_RADIUS / this.scale;
+        const categories = this.categories;
+        const highlightId = this.highlightCategoryId;
 
-        coordinates.forEach(point => {
-            const [x, y] = this.projectToCanvas(point.x, point.y);
+        // When a legend item is hovered, draw every other category dim and
+        // gray so the highlighted category's footprint stands out - a
+        // "where do these live" view without adding in-canvas text labels.
+        const highlightedIndices = highlightId !== null ? [] : null;
+
+        for (let i = 0; i < this.pointCount; i++) {
+            const [x, y] = this.projectToCanvas(this.xs[i], this.ys[i]);
 
             if (x < minWorldX - 50 || x > maxWorldX + 50 ||
                 y < minWorldY - 50 || y > maxWorldY + 50) {
-                return;
+                continue;
             }
 
-            ctx.fillStyle = `rgb(${point.color[0]}, ${point.color[1]}, ${point.color[2]})`;
-            ctx.globalAlpha = 0.7;
+            const catId = this.catIds[i];
+
+            if (highlightId !== null) {
+                if (catId === highlightId) {
+                    highlightedIndices.push(i);
+                    continue; // drawn in a second, on-top pass below
+                }
+                ctx.fillStyle = '#3a3a3a';
+                ctx.globalAlpha = 0.25;
+                ctx.beginPath();
+                ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+                continue;
+            }
+
+            const cat = categories[catId];
+            const rgb = cat ? cat.colorRGB : [128, 128, 128];
+
+            ctx.fillStyle = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+            ctx.globalAlpha = 0.75;
             ctx.beginPath();
             ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
             ctx.fill();
-        });
+        }
 
-        // Draw category labels (always shown, fully opaque white)
-        ctx.globalAlpha = 1.0;
-        ctx.fillStyle = '#ffffff';
-        ctx.strokeStyle = 'rgba(0,0,0,0.8)';
-        ctx.lineWidth = 4 / this.scale;
-        ctx.font = `bold ${14 / this.scale}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        categories.forEach(cat => {
-            const [x, y] = this.projectToCanvas(cat.x, cat.y);
-            ctx.strokeText(cat.label, x, y);
-            ctx.fillText(cat.label, x, y);
-        });
-
-        // Highlight hovered point
-        if (this.hoveredPoint) {
-            const [x, y] = this.projectToCanvas(this.hoveredPoint.x, this.hoveredPoint.y);
+        if (highlightedIndices) {
+            const cat = categories[highlightId];
+            const rgb = cat ? cat.colorRGB : [255, 255, 255];
+            ctx.fillStyle = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
             ctx.globalAlpha = 1;
-            ctx.strokeStyle = '#00d4ff';
+            const r = dotRadius * 1.4;
+            for (const i of highlightedIndices) {
+                const [x, y] = this.projectToCanvas(this.xs[i], this.ys[i]);
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Category labels only at higher zoom, fading in - keeps the base
+        // view clean like the paper figure (legend carries names at rest).
+        if (this.scale > this.LABEL_MIN_SCALE) {
+            ctx.globalAlpha = Math.min(1, (this.scale - this.LABEL_MIN_SCALE) / 0.6);
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+            ctx.lineWidth = 3 / this.scale;
+            ctx.font = `${13 / this.scale}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            for (const cat of categories) {
+                const [x, y] = this.projectToCanvas(cat.centroidX, cat.centroidY);
+                ctx.strokeText(cat.name, x, y);
+                ctx.fillText(cat.name, x, y);
+            }
+        }
+
+        if (this.hoveredPoint) {
+            const [x, y] = this.projectToCanvas(this.xs[this.hoveredPoint.index], this.ys[this.hoveredPoint.index]);
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 2 / this.scale;
             ctx.beginPath();
             ctx.arc(x, y, (dotRadius + 3 / this.scale), 0, Math.PI * 2);
             ctx.stroke();
         }
 
-        // Highlight selected point
         if (this.selectedPoint) {
-            const [x, y] = this.projectToCanvas(this.selectedPoint.x, this.selectedPoint.y);
+            const [x, y] = this.projectToCanvas(this.xs[this.selectedPoint.index], this.ys[this.selectedPoint.index]);
             ctx.globalAlpha = 1;
-            ctx.strokeStyle = '#ff00ff';
+            ctx.strokeStyle = '#00d4ff';
             ctx.lineWidth = 3 / this.scale;
             ctx.beginPath();
             ctx.arc(x, y, (dotRadius + 5 / this.scale), 0, Math.PI * 2);
@@ -341,7 +448,8 @@ class TSNEVisualization {
             const [worldX, worldY] = this.screenToWorld(mouseX, mouseY);
             const point = this.spatialIndex.query(worldX, worldY, this.HOVER_RADIUS / this.scale);
 
-            if (point !== this.hoveredPoint) {
+            const changed = (point?.index) !== (this.hoveredPoint?.index);
+            if (changed) {
                 this.hoveredPoint = point;
                 this.requestRender();
 
@@ -367,7 +475,6 @@ class TSNEVisualization {
         const mouseY = e.clientY - rect.top;
 
         const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-
         const [worldX, worldY] = this.screenToWorld(mouseX, mouseY);
 
         this.scale = Math.max(this.MIN_SCALE, Math.min(this.MAX_SCALE, this.scale * zoomFactor));
@@ -380,7 +487,7 @@ class TSNEVisualization {
         this.requestRender();
     }
 
-    handleClick(e) {
+    handleClick() {
         if (this.hoveredPoint) {
             this.selectedPoint = this.hoveredPoint;
             this.showSelectedInfo(this.selectedPoint);
@@ -391,13 +498,11 @@ class TSNEVisualization {
     zoom(factor) {
         const centerX = this.canvasWidth / 2;
         const centerY = this.canvasHeight / 2;
-
         const [worldX, worldY] = this.screenToWorld(centerX, centerY);
 
         this.scale = Math.max(this.MIN_SCALE, Math.min(this.MAX_SCALE, this.scale * factor));
 
         const [newScreenX, newScreenY] = this.worldToScreen(worldX, worldY);
-
         this.translateX += centerX - newScreenX;
         this.translateY += centerY - newScreenY;
 
@@ -417,50 +522,51 @@ class TSNEVisualization {
         this.requestRender();
     }
 
-    /** Render top 3 category names as badge spans (strips ':score' suffixes). */
-    renderCategoryBadges(topCategories) {
-        if (!topCategories || topCategories === 'N/A' || topCategories.toLowerCase() === 'nan') {
-            return '<span style="color:#555;font-size:12px">N/A</span>';
-        }
-        // Each entry may be "Name:score" — strip the score part for display
-        const badges = topCategories.split(';')
-            .map(s => s.trim().replace(/:\d+(\.\d+)?$/, '').trim())
-            .filter(Boolean)
-            .slice(0, 3);  // show at most 3
-        if (badges.length === 0) {
-            return '<span style="color:#555;font-size:12px">N/A</span>';
-        }
-        return badges
-            .map(b => `<span class="category-badge">${this.escapeHtml(b)}</span>`)
-            .join(' ');
+    categoryBadge(name) {
+        return `<span class="category-badge">${this.escapeHtml(name)}</span>`;
     }
 
-    /** Render a single badge for cross-classification label (format ↔ content). */
-    renderCrossBadge(crossLabel) {
-        if (!crossLabel || crossLabel === 'N/A' || crossLabel.toLowerCase() === 'nan') {
-            return '<span style="color:#555;font-size:12px">N/A</span>';
+    /**
+     * Render up to 3 hierarchy breadcrumbs (each a "Top > Mid > Leaf"
+     * string from the server) as nested chip chains, instead of a flat,
+     * same-looking pile of badges.
+     */
+    renderTagPaths(paths) {
+        if (!paths || !paths.length) {
+            return '<span class="placeholder-inline">N/A</span>';
         }
-        return `<span class="category-badge cross-badge">${this.escapeHtml(crossLabel)}</span>`;
+        return paths.slice(0, 3).map(path => {
+            const parts = path.split('>').map(p => p.trim()).filter(Boolean);
+            return `<div class="tag-path">${parts
+                .map(p => `<span class="tag-crumb">${this.escapeHtml(p)}</span>`)
+                .join('<span class="tag-sep">›</span>')}</div>`;
+        }).join('');
     }
 
-    crossLabelName() {
-        return this.classification === 'content' ? 'Format' : 'Content';
+    /** Standardized "Format: ... / Content: ..." block shown regardless of
+     *  which classification is currently being browsed. */
+    renderClassificationBlock(label, category, tags) {
+        return `
+            <div class="metadata-item">
+                <div class="metadata-label">${label}</div>
+                <div class="metadata-value">${this.categoryBadge(category)}</div>
+                <div class="tag-path-list">${this.renderTagPaths(tags)}</div>
+            </div>
+        `;
     }
 
     async showHoverInfo(point) {
-        const metadata = await this.fetchMetadata(point.id);
-
+        const videoId = this.ids[point.index];
+        const metadata = await this.fetchMetadata(videoId);
         if (!metadata) return;
 
-        // Update thumbnail
         const thumbnailContainer = document.getElementById('thumbnail-preview');
         thumbnailContainer.innerHTML = `
-            <img src="https://img.youtube.com/vi/${point.id}/maxresdefault.jpg"
+            <img src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg"
                  alt="Thumbnail"
-                 onerror="this.src='https://img.youtube.com/vi/${point.id}/hqdefault.jpg'">
+                 onerror="this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg'">
         `;
 
-        // Update metadata
         const metadataContainer = document.getElementById('hover-metadata');
         metadataContainer.innerHTML = `
             <div class="metadata-item">
@@ -472,16 +578,12 @@ class TSNEVisualization {
                 <div class="metadata-value">${this.escapeHtml(metadata.channel)}</div>
             </div>
             <div class="metadata-item">
-                <div class="metadata-label">Category</div>
-                <div class="metadata-value badge-row">
-                    ${this.renderCategoryBadges(metadata.topCategories)}
-                </div>
+                <div class="metadata-label">Format</div>
+                <div class="metadata-value">${this.categoryBadge(metadata.formatCategory)}</div>
             </div>
             <div class="metadata-item">
-                <div class="metadata-label">${this.crossLabelName()}</div>
-                <div class="metadata-value">
-                    ${this.renderCrossBadge(metadata.cross_label)}
-                </div>
+                <div class="metadata-label">Content</div>
+                <div class="metadata-value">${this.categoryBadge(metadata.contentCategory)}</div>
             </div>
             <div class="stats-row">
                 <div class="stat-item">
@@ -502,15 +604,14 @@ class TSNEVisualization {
     }
 
     async showSelectedInfo(point) {
-        const metadata = await this.fetchMetadata(point.id);
-
+        const videoId = this.ids[point.index];
+        const metadata = await this.fetchMetadata(videoId);
         if (!metadata) return;
 
-        // Update video embed
         const videoContainer = document.getElementById('video-embed');
         videoContainer.innerHTML = `
             <iframe
-                src="https://www.youtube.com/embed/${point.id}?autoplay=1"
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1"
                 title="YouTube video player"
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -518,7 +619,6 @@ class TSNEVisualization {
             </iframe>
         `;
 
-        // Update metadata
         const metadataContainer = document.getElementById('selected-metadata');
         metadataContainer.innerHTML = `
             <div class="metadata-item">
@@ -529,18 +629,8 @@ class TSNEVisualization {
                 <div class="metadata-label">Channel</div>
                 <div class="metadata-value">${this.escapeHtml(metadata.channel)}</div>
             </div>
-            <div class="metadata-item">
-                <div class="metadata-label">Category</div>
-                <div class="metadata-value badge-row">
-                    ${this.renderCategoryBadges(metadata.topCategories)}
-                </div>
-            </div>
-            <div class="metadata-item">
-                <div class="metadata-label">${this.crossLabelName()}</div>
-                <div class="metadata-value">
-                    ${this.renderCrossBadge(metadata.cross_label)}
-                </div>
-            </div>
+            ${this.renderClassificationBlock('Format', metadata.formatCategory, metadata.formatTags)}
+            ${this.renderClassificationBlock('Content', metadata.contentCategory, metadata.contentTags)}
             <div class="stats-row">
                 <div class="stat-item">
                     <div class="stat-value">${this.formatNumber(metadata.viewCount)}</div>
@@ -591,7 +681,6 @@ class TSNEVisualization {
 
             if (data.results && data.results.length > 0) {
                 const firstResult = data.results[0];
-
                 const [worldX, worldY] = this.projectToCanvas(firstResult.x, firstResult.y);
 
                 const centerX = this.canvasWidth / 2;
@@ -601,18 +690,21 @@ class TSNEVisualization {
                 this.translateX = centerX - worldX * this.scale;
                 this.translateY = centerY - worldY * this.scale;
 
-                this.selectedPoint = {
-                    id: firstResult.id,
-                    x: firstResult.x,
-                    y: firstResult.y
-                };
+                // Find the local index for this id so canvas highlighting works.
+                const idx = this.ids.indexOf(firstResult.id);
+                this.selectedPoint = idx >= 0 ? { index: idx } : null;
 
-                this.showSelectedInfo(this.selectedPoint);
+                this.showSelectedInfoFromMetadata(firstResult);
                 this.requestRender();
             }
         } catch (error) {
             console.error('Search error:', error);
         }
+    }
+
+    showSelectedInfoFromMetadata(metadata) {
+        this.metadataCache.set(metadata.id, metadata);
+        this.showSelectedInfo({ index: this.ids.indexOf(metadata.id) });
     }
 
     switchClassification(classification) {
@@ -621,7 +713,7 @@ class TSNEVisualization {
     }
 
     formatNumber(num) {
-        const n = parseInt(num);
+        const n = parseInt(String(num).replace(/,/g, ''), 10);
         if (isNaN(n)) return num;
         if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
         if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
@@ -630,10 +722,9 @@ class TSNEVisualization {
 
     escapeHtml(text) {
         const div = document.createElement('div');
-        div.textContent = text;
+        div.textContent = text == null ? '' : text;
         return div.innerHTML;
     }
 }
 
-// Initialize app
 const app = new TSNEVisualization();

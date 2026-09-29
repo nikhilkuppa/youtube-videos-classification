@@ -4,4 +4,4 @@ services:
     runtime: python
     rootDir: ./web_app
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn --workers 4 --bind 0.0.0.0:$PORT backend.api:app
+    startCommand: gunicorn --workers ${WEB_CONCURRENCY:-3} --timeout 120 --bind 0.0.0.0:$PORT backend.api:app

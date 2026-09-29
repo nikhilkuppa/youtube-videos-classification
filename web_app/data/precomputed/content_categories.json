@@ -1,0 +1,178 @@
+[
+  {
+    "id": 0,
+    "name": "Entertainment & media",
+    "colorHex": "#ff6f61",
+    "count": 35804,
+    "centroidX": 7.774507,
+    "centroidY": 17.814476
+  },
+  {
+    "id": 1,
+    "name": "Natural sciences",
+    "colorHex": "#e6194b",
+    "count": 28447,
+    "centroidX": -36.049904,
+    "centroidY": 15.147469
+  },
+  {
+    "id": 2,
+    "name": "Skills & how-to",
+    "colorHex": "#00b894",
+    "count": 9140,
+    "centroidX": -22.263117,
+    "centroidY": -53.5746385
+  },
+  {
+    "id": 3,
+    "name": "News & current affairs",
+    "colorHex": "#ffd700",
+    "count": 8744,
+    "centroidX": 57.505982,
+    "centroidY": 8.119373
+  },
+  {
+    "id": 4,
+    "name": "Business & law",
+    "colorHex": "#e6beff",
+    "count": 7049,
+    "centroidX": 46.19974,
+    "centroidY": 44.890972
+  },
+  {
+    "id": 5,
+    "name": "Engineering & manufacturing",
+    "colorHex": "#911eb4",
+    "count": 6858,
+    "centroidX": -11.796299000000001,
+    "centroidY": 29.827657000000002
+  },
+  {
+    "id": 6,
+    "name": "Social sciences",
+    "colorHex": "#4363d8",
+    "count": 5943,
+    "centroidX": 38.450565,
+    "centroidY": 1.5799372
+  },
+  {
+    "id": 7,
+    "name": "Lifestyle & personal",
+    "colorHex": "#ff2ba8",
+    "count": 5246,
+    "centroidX": 0.43948935,
+    "centroidY": -28.679223
+  },
+  {
+    "id": 8,
+    "name": "Humanities",
+    "colorHex": "#f58231",
+    "count": 4944,
+    "centroidX": 26.380388500000002,
+    "centroidY": 18.169511
+  },
+  {
+    "id": 9,
+    "name": "Growth & career",
+    "colorHex": "#6c5ce7",
+    "count": 4882,
+    "centroidX": 15.262591,
+    "centroidY": -12.2422625
+  },
+  {
+    "id": 10,
+    "name": "Health & welfare",
+    "colorHex": "#46f0f0",
+    "count": 3694,
+    "centroidX": -8.151643499999999,
+    "centroidY": 18.6926615
+  },
+  {
+    "id": 11,
+    "name": "Arts & culture",
+    "colorHex": "#bcf60c",
+    "count": 3666,
+    "centroidX": 23.381485,
+    "centroidY": -34.846861000000004
+  },
+  {
+    "id": 12,
+    "name": "Gaming & digital culture",
+    "colorHex": "#1e90ff",
+    "count": 3015,
+    "centroidX": -81.59192,
+    "centroidY": -1.5676928
+  },
+  {
+    "id": 13,
+    "name": "Wellbeing & fitness",
+    "colorHex": "#55efc4",
+    "count": 2951,
+    "centroidX": 5.091438,
+    "centroidY": 6.9582105
+  },
+  {
+    "id": 14,
+    "name": "Education & teaching",
+    "colorHex": "#f032e6",
+    "count": 2935,
+    "centroidX": -13.128809,
+    "centroidY": -35.285347
+  },
+  {
+    "id": 15,
+    "name": "Technology",
+    "colorHex": "#fabebe",
+    "count": 2165,
+    "centroidX": -32.0069,
+    "centroidY": -32.22559
+  },
+  {
+    "id": 16,
+    "name": "Misc & internet culture",
+    "colorHex": "#a29bfe",
+    "count": 2057,
+    "centroidX": -16.303644,
+    "centroidY": -14.586511
+  },
+  {
+    "id": 17,
+    "name": "Languages & literature",
+    "colorHex": "#fffac8",
+    "count": 1375,
+    "centroidX": -4.8087435,
+    "centroidY": -44.063152
+  },
+  {
+    "id": 18,
+    "name": "Sports & athletics",
+    "colorHex": "#00cec9",
+    "count": 1202,
+    "centroidX": 47.612576000000004,
+    "centroidY": -16.5415985
+  },
+  {
+    "id": 19,
+    "name": "Religion & spirituality",
+    "colorHex": "#800000",
+    "count": 420,
+    "centroidX": 27.6934085,
+    "centroidY": 1.9256112
+  },
+  {
+    "id": 20,
+    "name": "Agriculture & environment",
+    "colorHex": "#008080",
+    "count": 14,
+    "centroidX": 4.1067335499999995,
+    "centroidY": 32.856218
+  },
+  {
+    "id": 21,
+    "name": "Uncategorized",
+    "colorHex": "#555555",
+    "count": 3,
+    "centroidX": 32.996532,
+    "centroidY": 35.24525
+  }
+]

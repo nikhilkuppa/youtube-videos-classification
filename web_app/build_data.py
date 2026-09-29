@@ -18,14 +18,16 @@ Run once whenever classifications/taxonomy change:
 Outputs, per classification, into web_app/data/precomputed/:
     {classification}.bin              packed <11s id><float32 x><float32 y><uint8 category_id>
     {classification}_categories.json  [{id, name, colorHex, count, centroidX, centroidY}, ...]
-    {classification}_meta.json.gz     {video_id: {title, channel, url, viewCount, likeCount,
-                                        videoName, category, contentCategory, contentTags,
-                                        formatCategory, formatTags}}
+    {classification}_meta.sqlite      videos(id, title, channel, url, viewCount, likeCount,
+                                       videoName, category, contentCategory, contentTags,
+                                       formatCategory, formatTags) - queried on demand, not
+                                       loaded into RAM (270k rich records as a Python dict
+                                       measured over 1GB RSS - too heavy for a 512MB instance)
 """
 import argparse
 import csv
-import gzip
 import json
+import sqlite3
 import statistics
 import struct
 import sys
@@ -315,10 +317,46 @@ def build_classification(classification: str, retag_index: dict):
         json.dump(categories_out, f, indent=2)
     print(f"  wrote {cat_path} ({len(categories_out)} categories)")
 
-    meta_path_out = OUT_DIR / f'{classification}_meta.json.gz'
-    with gzip.open(meta_path_out, 'wt', encoding='utf-8') as f:
-        json.dump(meta, f)
-    print(f"  wrote {meta_path_out} ({meta_path_out.stat().st_size / 1024:.0f} KB gzipped)")
+    # Per-video metadata goes into SQLite, not a Python dict loaded whole
+    # into RAM: holding ~270k rich dict-of-dicts records in a live process
+    # measured over 1GB RSS (huge per-object overhead), which is what blew
+    # past Render's 512MB limit. SQLite keeps this on disk and answers
+    # single-row/LIKE queries in well under a millisecond at this scale.
+    db_path = OUT_DIR / f'{classification}_meta.sqlite'
+    if db_path.exists():
+        db_path.unlink()
+    conn = sqlite3.connect(db_path)
+    conn.execute('''
+        CREATE TABLE videos (
+            id TEXT PRIMARY KEY,
+            title TEXT, channel TEXT, url TEXT,
+            viewCount TEXT, likeCount TEXT, videoName TEXT,
+            category TEXT,
+            contentCategory TEXT, contentTags TEXT,
+            formatCategory TEXT, formatTags TEXT
+        )
+    ''')
+    conn.executemany(
+        '''INSERT INTO videos VALUES (:id, :title, :channel, :url, :viewCount,
+           :likeCount, :videoName, :category, :contentCategory, :contentTags,
+           :formatCategory, :formatTags)''',
+        (
+            {
+                'id': vid,
+                'title': v['title'], 'channel': v['channel'], 'url': v['url'],
+                'viewCount': v['viewCount'], 'likeCount': v['likeCount'],
+                'videoName': v['videoName'], 'category': v['category'],
+                'contentCategory': v['contentCategory'],
+                'contentTags': json.dumps(v['contentTags']),
+                'formatCategory': v['formatCategory'],
+                'formatTags': json.dumps(v['formatTags']),
+            }
+            for vid, v in meta.items()
+        )
+    )
+    conn.commit()
+    conn.close()
+    print(f"  wrote {db_path} ({db_path.stat().st_size / 1024:.0f} KB)")
 
 
 def main():

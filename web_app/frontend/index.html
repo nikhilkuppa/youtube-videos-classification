@@ -402,6 +402,12 @@
             color: #666;
         }
 
+        .legend-hint {
+            font-size: 10.5px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
         .legend-list {
             max-height: 220px;
             overflow-y: auto;
@@ -419,13 +425,24 @@
             padding: 3px 6px;
             margin: 0 -6px;
             border-radius: 5px;
-            cursor: default;
-            transition: background 0.15s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: background 0.15s, border-color 0.15s;
         }
 
         .legend-item:hover {
             background: rgba(255, 255, 255, 0.08);
             color: #fff;
+        }
+
+        .legend-item.isolated {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .legend-item.isolated .legend-name {
+            font-weight: 600;
         }
 
         .legend-swatch {
@@ -538,6 +555,7 @@
 
                 <div class="panel-section">
                     <h3>Legend</h3>
+                    <div class="legend-hint">Hover to preview &middot; click to isolate</div>
                     <div class="legend-list" id="legend-list"></div>
                 </div>
 

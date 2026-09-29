@@ -100,6 +100,7 @@ class TSNEVisualization {
         this.hoveredPoint = null;
         this.selectedPoint = null;
         this.highlightCategoryId = null; // set while hovering a legend item
+        this.isolatedCategoryId = null;  // set by clicking a legend item - sticky until cleared
 
         // Performance
         this.spatialIndex = new SpatialIndex(50);
@@ -250,6 +251,7 @@ class TSNEVisualization {
         const container = document.getElementById('legend-list');
         const sorted = [...this.categories].sort((a, b) => b.count - a.count);
         this.categoriesById = new Map(this.categories.map(c => [c.id, c]));
+        this.isolatedCategoryId = null;
 
         container.innerHTML = sorted.map(c => `
             <div class="legend-item" data-category-id="${c.id}">
@@ -277,6 +279,22 @@ class TSNEVisualization {
                 this.requestRender();
                 tooltip.style.display = 'none';
             });
+            // Click pins the isolation: only this category's dots stay
+            // visible until you click it again or click empty canvas space.
+            el.addEventListener('click', () => {
+                this.isolatedCategoryId = this.isolatedCategoryId === catId ? null : catId;
+                this.updateLegendActiveStates();
+                this.requestRender();
+            });
+        });
+
+        this.updateLegendActiveStates();
+    }
+
+    updateLegendActiveStates() {
+        document.querySelectorAll('.legend-item').forEach(el => {
+            const catId = parseInt(el.dataset.categoryId, 10);
+            el.classList.toggle('isolated', catId === this.isolatedCategoryId);
         });
     }
 
@@ -383,11 +401,15 @@ class TSNEVisualization {
 
         const dotRadius = this.DOT_RADIUS / this.scale;
         const categories = this.categories;
-        const highlightId = this.highlightCategoryId;
+        // A click-isolated category wins over a merely-hovered one; either
+        // way this is the id whose dots get pulled out and emphasized.
+        const isolating = this.isolatedCategoryId !== null;
+        const highlightId = isolating ? this.isolatedCategoryId : this.highlightCategoryId;
 
-        // When a legend item is hovered, draw every other category dim and
-        // gray so the highlighted category's footprint stands out - a
-        // "where do these live" view without adding in-canvas text labels.
+        // Hovering a legend item dims every other category to gray so the
+        // highlighted one's footprint stands out. Clicking it goes further
+        // and hides the rest entirely, so only that category's dots remain
+        // clickable/visible until it's un-isolated.
         const highlightedIndices = highlightId !== null ? [] : null;
 
         for (let i = 0; i < this.pointCount; i++) {
@@ -404,6 +426,9 @@ class TSNEVisualization {
                 if (catId === highlightId) {
                     highlightedIndices.push(i);
                     continue; // drawn in a second, on-top pass below
+                }
+                if (isolating) {
+                    continue; // hidden entirely while isolated
                 }
                 ctx.fillStyle = '#3a3a3a';
                 ctx.globalAlpha = 0.25;
@@ -524,7 +549,15 @@ class TSNEVisualization {
             this.requestRender();
         } else {
             const [worldX, worldY] = this.screenToWorld(mouseX, mouseY);
-            const point = this.spatialIndex.query(worldX, worldY, this.HOVER_RADIUS / this.scale);
+            let point = this.spatialIndex.query(worldX, worldY, this.HOVER_RADIUS / this.scale);
+
+            // While isolated, hidden dots (any other category) shouldn't be
+            // hoverable/clickable even if the cursor lands where one used
+            // to be visually - otherwise a click there would look like it
+            // did nothing instead of un-isolating.
+            if (point && this.isolatedCategoryId !== null && this.catIds[point.index] !== this.isolatedCategoryId) {
+                point = null;
+            }
 
             const changed = (point?.index) !== (this.hoveredPoint?.index);
             if (changed) {
@@ -570,6 +603,12 @@ class TSNEVisualization {
             this.selectedPoint = this.hoveredPoint;
             this.showSelectedInfo(this.selectedPoint);
             this.requestRender();
+        } else if (this.isolatedCategoryId !== null) {
+            // Clicked empty space (or a now-hidden dot's old spot) while
+            // isolated - bring the full plot back.
+            this.isolatedCategoryId = null;
+            this.updateLegendActiveStates();
+            this.requestRender();
         }
     }
 
@@ -593,6 +632,8 @@ class TSNEVisualization {
         this.translateY = 0;
         this.hoveredPoint = null;
         this.selectedPoint = null;
+        this.isolatedCategoryId = null;
+        this.updateLegendActiveStates();
 
         this.buildSpatialIndex();
         this.clearHoverInfo();

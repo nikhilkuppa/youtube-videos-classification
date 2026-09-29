@@ -242,6 +242,8 @@ class TSNEVisualization {
     renderLegend() {
         const container = document.getElementById('legend-list');
         const sorted = [...this.categories].sort((a, b) => b.count - a.count);
+        this.categoriesById = new Map(this.categories.map(c => [c.id, c]));
+
         container.innerHTML = sorted.map(c => `
             <div class="legend-item" data-category-id="${c.id}">
                 <span class="legend-swatch" style="background:${c.colorHex}"></span>
@@ -250,17 +252,65 @@ class TSNEVisualization {
             </div>
         `).join('');
 
+        const tooltip = document.getElementById('legend-tooltip');
+
         container.querySelectorAll('.legend-item').forEach(el => {
             const catId = parseInt(el.dataset.categoryId, 10);
-            el.addEventListener('mouseenter', () => {
+
+            el.addEventListener('mouseenter', (e) => {
                 this.highlightCategoryId = catId;
                 this.requestRender();
+                this.showLegendTooltip(catId, e.clientX, e.clientY);
+            });
+            el.addEventListener('mousemove', (e) => {
+                this.positionLegendTooltip(e.clientX, e.clientY);
             });
             el.addEventListener('mouseleave', () => {
                 this.highlightCategoryId = null;
                 this.requestRender();
+                tooltip.style.display = 'none';
             });
         });
+    }
+
+    /** Breakdown tooltip: shows the finer-grained tags inside a legend
+     *  color, so it's clear why one color can appear as separate blobs. */
+    showLegendTooltip(categoryId, clientX, clientY) {
+        const cat = this.categoriesById.get(categoryId);
+        const tooltip = document.getElementById('legend-tooltip');
+        if (!cat) return;
+
+        const subs = cat.subcategories || [];
+        const rows = subs.length
+            ? subs.map(s => `
+                <div class="legend-tooltip-row">
+                    <span class="legend-tooltip-name">${this.escapeHtml(s.name)}</span>
+                    <span class="legend-tooltip-count">${s.count.toLocaleString()}</span>
+                </div>
+            `).join('')
+            : '<div class="placeholder-inline">No further breakdown</div>';
+
+        tooltip.innerHTML = `
+            <div class="legend-tooltip-header">
+                <span class="legend-swatch" style="background:${cat.colorHex}"></span>
+                ${this.escapeHtml(cat.name)}
+            </div>
+            ${rows}
+        `;
+        tooltip.style.display = 'block';
+        this.positionLegendTooltip(clientX, clientY);
+    }
+
+    positionLegendTooltip(clientX, clientY) {
+        const tooltip = document.getElementById('legend-tooltip');
+        if (tooltip.style.display === 'none') return;
+
+        const gap = 14;
+        const maxX = window.innerWidth - tooltip.offsetWidth - 8;
+        const maxY = window.innerHeight - tooltip.offsetHeight - 8;
+
+        tooltip.style.left = `${Math.min(clientX + gap, maxX)}px`;
+        tooltip.style.top = `${Math.min(clientY, maxY)}px`;
     }
 
     buildSpatialIndex() {
@@ -378,11 +428,32 @@ class TSNEVisualization {
                 ctx.arc(x, y, r, 0, Math.PI * 2);
                 ctx.fill();
             }
-        }
 
-        // Category labels only at higher zoom, fading in - keeps the base
-        // view clean like the paper figure (legend carries names at rest).
-        if (this.scale > this.LABEL_MIN_SCALE) {
+            // One label per sub-blob, at its own centroid (not the parent
+            // category's, which can land in the gap between two blobs) -
+            // sized by how much of the category it accounts for, so the
+            // biggest chunk reads first.
+            const subs = (cat && cat.subcategories) || [];
+            if (subs.length) {
+                const maxCount = Math.max(...subs.map(s => s.count));
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.strokeStyle = 'rgba(0,0,0,0.9)';
+                ctx.fillStyle = '#ffffff';
+                for (const sub of subs) {
+                    const [x, y] = this.projectToCanvas(sub.centroidX, sub.centroidY);
+                    const weight = Math.sqrt(sub.count / maxCount); // 0..1
+                    const fontPx = (12 + 12 * weight) / this.scale;
+                    ctx.font = `${weight > 0.55 ? 'bold ' : ''}${fontPx}px sans-serif`;
+                    ctx.lineWidth = (3 + 2 * weight) / this.scale;
+                    ctx.strokeText(sub.name, x, y);
+                    ctx.fillText(sub.name, x, y);
+                }
+            }
+        } else if (this.scale > this.LABEL_MIN_SCALE) {
+            // Otherwise, category labels only at higher zoom, fading in -
+            // keeps the base view clean like the paper figure (legend
+            // carries names at rest).
             ctx.globalAlpha = Math.min(1, (this.scale - this.LABEL_MIN_SCALE) / 0.6);
             ctx.fillStyle = '#ffffff';
             ctx.strokeStyle = 'rgba(0,0,0,0.85)';

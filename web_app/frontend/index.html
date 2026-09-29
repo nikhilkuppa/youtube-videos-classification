@@ -451,6 +451,45 @@
             color: #555;
             font-size: 12px;
         }
+
+        .legend-tooltip {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 10px 12px;
+            min-width: 170px;
+            max-width: 260px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        .legend-tooltip-header {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #262626;
+        }
+
+        .legend-tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 12px;
+            color: #ccc;
+            padding: 2px 0;
+        }
+
+        .legend-tooltip-count {
+            color: #777;
+        }
     </style>
 </head>
 <body>
@@ -524,6 +563,8 @@
             </div>
         </div>
     </div>
+
+    <div class="legend-tooltip" id="legend-tooltip"></div>
 
     <script src="app.js"></script>
 </body>

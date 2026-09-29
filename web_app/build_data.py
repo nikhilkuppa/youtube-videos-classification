@@ -173,9 +173,35 @@ def format_tag_paths(row: dict) -> list:
     return paths
 
 
+def content_subcategory(row: dict) -> str:
+    """
+    The mid-level tag, one step more specific than the supercategory this
+    video is colored by (e.g. "Comedy" or "Movies & TV" inside the
+    "Entertainment & media" bucket). Explains why one legend color can show
+    up as several separate blobs on the map - they're different subtopics
+    that just happen to share a top-level color.
+    """
+    return row.get('content_Tag1_category', '').strip() or UNCATEGORIZED
+
+
+def format_subcategory(row: dict) -> str:
+    """
+    The raw (level-3) detailed format tag, one step more specific than the
+    analysis_label this video is colored by, e.g. "chalkboard"/"whiteboard"
+    inside a "Writing Board" bucket. There's no separate human-readable name
+    for this level in the taxonomy, so this is a light cleanup of the raw
+    tag string (its last '.'-segment, capitalized).
+    """
+    raw = row.get('format_tag1', '').strip()
+    if not raw:
+        return UNCATEGORIZED
+    leaf = raw.rsplit('.', 1)[-1].replace('_', ' ')
+    return leaf[:1].upper() + leaf[1:] if leaf else UNCATEGORIZED
+
+
 CLASSIFIERS = {
-    'content': (content_category, CONTENT_PALETTE),
-    'format': (format_category, FORMAT_PALETTE),
+    'content': (content_category, content_subcategory, CONTENT_PALETTE),
+    'format': (format_category, format_subcategory, FORMAT_PALETTE),
 }
 
 
@@ -209,10 +235,13 @@ def build_classification(classification: str, retag_index: dict):
     if not meta_path.exists():
         sys.exit(f"ERROR: metadata file not found: {meta_path}")
 
-    classify_fn, palette = CLASSIFIERS[classification]
+    classify_fn, subcategory_fn, palette = CLASSIFIERS[classification]
 
-    ids, xs, ys, cat_names = [], [], [], []
+    ids, xs, ys, cat_names, subcat_names = [], [], [], [], []
     meta = {}
+    # category -> Counter of its finer-grained subcategory tag, so the
+    # legend can explain e.g. why one color shows up as two separate blobs.
+    subcat_counts = defaultdict(Counter)
     skipped = 0
     malformed_id = 0
 
@@ -230,11 +259,12 @@ def build_classification(classification: str, retag_index: dict):
             retag_row = retag_index.get(vid)
             if retag_row is None:
                 skipped += 1
-                category = UNCATEGORIZED
+                category, subcategory = UNCATEGORIZED, UNCATEGORIZED
                 content_cat, content_tags = UNCATEGORIZED, []
                 format_cat, format_tags = UNCATEGORIZED, []
             else:
                 category = classify_fn(retag_row)
+                subcategory = subcategory_fn(retag_row)
                 content_cat, content_tags = content_category(retag_row), content_tag_paths(retag_row)
                 format_cat, format_tags = format_category(retag_row), format_tag_paths(retag_row)
 
@@ -248,6 +278,8 @@ def build_classification(classification: str, retag_index: dict):
             xs.append(x)
             ys.append(y)
             cat_names.append(category)
+            subcat_names.append(subcategory)
+            subcat_counts[category][subcategory] += 1
 
             video_name = row.get('video_name', 'N/A')
             meta[vid] = {
@@ -288,9 +320,27 @@ def build_classification(classification: str, retag_index: dict):
         xs_by_cat[name].append(x)
         ys_by_cat[name].append(y)
 
+    # Same, but keyed by (category, subcategory) - lets the frontend place a
+    # subcategory's label at its own actual blob instead of the parent
+    # category's single (possibly in-between-blobs) centroid.
+    sub_xs = defaultdict(list)
+    sub_ys = defaultdict(list)
+    for x, y, name, sub in zip(xs, ys, cat_names, subcat_names):
+        sub_xs[(name, sub)].append(x)
+        sub_ys[(name, sub)].append(y)
+
     categories_out = []
     for name in ordered:
         color_hex = palette.get(name, UNCATEGORIZED_COLOR)
+        top_subcats = [
+            {
+                'name': sub_name,
+                'count': sub_count,
+                'centroidX': statistics.median(sub_xs[(name, sub_name)]),
+                'centroidY': statistics.median(sub_ys[(name, sub_name)]),
+            }
+            for sub_name, sub_count in subcat_counts[name].most_common(8)
+        ]
         categories_out.append({
             'id': cat_id_of[name],
             'name': name,
@@ -298,6 +348,7 @@ def build_classification(classification: str, retag_index: dict):
             'count': counts[name],
             'centroidX': statistics.median(xs_by_cat[name]),
             'centroidY': statistics.median(ys_by_cat[name]),
+            'subcategories': top_subcats,
         })
 
     # Binary coordinates: <11-byte ascii id><float32 x><float32 y><uint8 category_id>

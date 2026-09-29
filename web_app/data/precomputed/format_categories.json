@@ -5,7 +5,21 @@
     "colorHex": "#e6194b",
     "count": 43023,
     "centroidX": 25.41059,
-    "centroidY": 49.812317
+    "centroidY": 49.812317,
+    "subcategories": [
+      {
+        "name": "Frameregular",
+        "count": 40738,
+        "centroidX": 28.538415999999998,
+        "centroidY": 47.5410015
+      },
+      {
+        "name": "Framecorner",
+        "count": 2285,
+        "centroidX": -59.59377,
+        "centroidY": 66.593605
+      }
+    ]
   },
   {
     "id": 1,
@@ -13,7 +27,15 @@
     "colorHex": "#3cb44b",
     "count": 18942,
     "centroidX": -18.121045000000002,
-    "centroidY": -16.344354
+    "centroidY": -16.344354,
+    "subcategories": [
+      {
+        "name": "Docustyle",
+        "count": 18942,
+        "centroidX": -18.121045000000002,
+        "centroidY": -16.344354
+      }
+    ]
   },
   {
     "id": 2,
@@ -21,7 +43,21 @@
     "colorHex": "#4363d8",
     "count": 11399,
     "centroidX": -64.82154,
-    "centroidY": 33.58807
+    "centroidY": 33.58807,
+    "subcategories": [
+      {
+        "name": "Info",
+        "count": 7380,
+        "centroidX": -66.373845,
+        "centroidY": 37.644491
+      },
+      {
+        "name": "Graphics",
+        "count": 4019,
+        "centroidX": -62.75573,
+        "centroidY": 26.676653
+      }
+    ]
   },
   {
     "id": 3,
@@ -29,7 +65,15 @@
     "colorHex": "#911eb4",
     "count": 10085,
     "centroidX": -95.45502,
-    "centroidY": -37.55864
+    "centroidY": -37.55864,
+    "subcategories": [
+      {
+        "name": "Stylus",
+        "count": 10085,
+        "centroidX": -95.45502,
+        "centroidY": -37.55864
+      }
+    ]
   },
   {
     "id": 4,
@@ -37,7 +81,33 @@
     "colorHex": "#f58231",
     "count": 9957,
     "centroidX": 68.12272,
-    "centroidY": 12.341254
+    "centroidY": 12.341254,
+    "subcategories": [
+      {
+        "name": "Casual",
+        "count": 4174,
+        "centroidX": -0.86756417,
+        "centroidY": -56.1516435
+      },
+      {
+        "name": "Podcast",
+        "count": 4016,
+        "centroidX": 104.680655,
+        "centroidY": 32.05264
+      },
+      {
+        "name": "Formal",
+        "count": 1689,
+        "centroidX": 51.24887,
+        "centroidY": 40.854332
+      },
+      {
+        "name": "Street",
+        "count": 78,
+        "centroidX": 16.9622225,
+        "centroidY": -0.2981237
+      }
+    ]
   },
   {
     "id": 5,
@@ -45,7 +115,15 @@
     "colorHex": "#46f0f0",
     "count": 6640,
     "centroidX": 72.845875,
-    "centroidY": -39.57209
+    "centroidY": -39.57209,
+    "subcategories": [
+      {
+        "name": "Persononstage",
+        "count": 6640,
+        "centroidX": 72.845875,
+        "centroidY": -39.57209
+      }
+    ]
   },
   {
     "id": 6,
@@ -53,7 +131,27 @@
     "colorHex": "#f032e6",
     "count": 5587,
     "centroidX": -1.5911984,
-    "centroidY": -95.61164
+    "centroidY": -95.61164,
+    "subcategories": [
+      {
+        "name": "Cooking",
+        "count": 3108,
+        "centroidX": 14.28257625,
+        "centroidY": -110.707495
+      },
+      {
+        "name": "Engineering",
+        "count": 1486,
+        "centroidX": -27.4166775,
+        "centroidY": 1.4243784
+      },
+      {
+        "name": "Science",
+        "count": 993,
+        "centroidX": -34.44583,
+        "centroidY": -5.1502037
+      }
+    ]
   },
   {
     "id": 7,
@@ -61,7 +159,15 @@
     "colorHex": "#bcf60c",
     "count": 3481,
     "centroidX": 63.14892,
-    "centroidY": -73.60092
+    "centroidY": -73.60092,
+    "subcategories": [
+      {
+        "name": "Classroom",
+        "count": 3481,
+        "centroidX": 63.14892,
+        "centroidY": -73.60092
+      }
+    ]
   },
   {
     "id": 8,
@@ -69,7 +175,27 @@
     "colorHex": "#fabebe",
     "count": 3360,
     "centroidX": -107.1298755,
-    "centroidY": 46.6861375
+    "centroidY": 46.6861375,
+    "subcategories": [
+      {
+        "name": "Cartoon",
+        "count": 3065,
+        "centroidX": -108.46231,
+        "centroidY": 44.897522
+      },
+      {
+        "name": "Comic",
+        "count": 203,
+        "centroidX": -104.17702,
+        "centroidY": 72.99286
+      },
+      {
+        "name": "Cutouts",
+        "count": 92,
+        "centroidX": -62.732336000000004,
+        "centroidY": -14.5300365
+      }
+    ]
   },
   {
     "id": 9,
@@ -77,7 +203,15 @@
     "colorHex": "#008080",
     "count": 2970,
     "centroidX": 20.882627,
-    "centroidY": -72.25889000000001
+    "centroidY": -72.25889000000001,
+    "subcategories": [
+      {
+        "name": "Skit",
+        "count": 2970,
+        "centroidX": 20.882627,
+        "centroidY": -72.25889000000001
+      }
+    ]
   },
   {
     "id": 10,
@@ -85,7 +219,21 @@
     "colorHex": "#9a6324",
     "count": 2629,
     "centroidX": -67.59012,
-    "centroidY": 24.48831
+    "centroidY": 24.48831,
+    "subcategories": [
+      {
+        "name": "Screencast",
+        "count": 2539,
+        "centroidX": -67.39597,
+        "centroidY": 24.821468
+      },
+      {
+        "name": "Keystrokes",
+        "count": 90,
+        "centroidX": -69.94045,
+        "centroidY": 16.746164
+      }
+    ]
   },
   {
     "id": 11,
@@ -93,7 +241,15 @@
     "colorHex": "#800000",
     "count": 2616,
     "centroidX": -64.501935,
-    "centroidY": -76.62303499999999
+    "centroidY": -76.62303499999999,
+    "subcategories": [
+      {
+        "name": "Gaming",
+        "count": 2616,
+        "centroidX": -64.501935,
+        "centroidY": -76.62303499999999
+      }
+    ]
   },
   {
     "id": 12,
@@ -101,7 +257,33 @@
     "colorHex": "#808080",
     "count": 2472,
     "centroidX": -16.758483,
-    "centroidY": -101.67069
+    "centroidY": -101.67069,
+    "subcategories": [
+      {
+        "name": "Placeholderdisplay",
+        "count": 1119,
+        "centroidX": -26.670977,
+        "centroidY": -117.46939
+      },
+      {
+        "name": "Rawfootage",
+        "count": 634,
+        "centroidX": -12.4141755,
+        "centroidY": -93.64359999999999
+      },
+      {
+        "name": "Dance",
+        "count": 534,
+        "centroidX": 15.9302575,
+        "centroidY": -47.852547
+      },
+      {
+        "name": "Surveillancefootage",
+        "count": 185,
+        "centroidX": -36.915176,
+        "centroidY": -42.368286
+      }
+    ]
   },
   {
     "id": 13,
@@ -109,7 +291,27 @@
     "colorHex": "#e6beff",
     "count": 2362,
     "centroidX": 46.270611,
-    "centroidY": -76.01651
+    "centroidY": -76.01651,
+    "subcategories": [
+      {
+        "name": "Chalkboard",
+        "count": 1335,
+        "centroidX": 66.440865,
+        "centroidY": -97.99946
+      },
+      {
+        "name": "Whiteboard",
+        "count": 703,
+        "centroidX": 37.426395,
+        "centroidY": -28.782663
+      },
+      {
+        "name": "Lightboard",
+        "count": 324,
+        "centroidX": -77.40979,
+        "centroidY": -53.291028499999996
+      }
+    ]
   },
   {
     "id": 14,
@@ -117,7 +319,21 @@
     "colorHex": "#aaffc3",
     "count": 1867,
     "centroidX": 22.048672,
-    "centroidY": -14.913106
+    "centroidY": -14.913106,
+    "subcategories": [
+      {
+        "name": "Slides",
+        "count": 1623,
+        "centroidX": 57.5066,
+        "centroidY": -35.662807
+      },
+      {
+        "name": "Powerpoint",
+        "count": 244,
+        "centroidX": -77.3282275,
+        "centroidY": 3.79377115
+      }
+    ]
   },
   {
     "id": 15,
@@ -125,7 +341,21 @@
     "colorHex": "#ffd700",
     "count": 1201,
     "centroidX": 65.408806,
-    "centroidY": 29.242075
+    "centroidY": 29.242075,
+    "subcategories": [
+      {
+        "name": "Inperson",
+        "count": 695,
+        "centroidX": 67.29775,
+        "centroidY": 23.709856
+      },
+      {
+        "name": "Virtual",
+        "count": 506,
+        "centroidX": 45.338587,
+        "centroidY": 57.077622500000004
+      }
+    ]
   },
   {
     "id": 16,
@@ -133,7 +363,15 @@
     "colorHex": "#ff6f61",
     "count": 767,
     "centroidX": -67.35612,
-    "centroidY": -17.068394
+    "centroidY": -17.068394,
+    "subcategories": [
+      {
+        "name": "Hand",
+        "count": 767,
+        "centroidX": -67.35612,
+        "centroidY": -17.068394
+      }
+    ]
   },
   {
     "id": 17,
@@ -141,6 +379,20 @@
     "colorHex": "#6c5ce7",
     "count": 685,
     "centroidX": -20.35703,
-    "centroidY": -29.658815
+    "centroidY": -29.658815,
+    "subcategories": [
+      {
+        "name": "Realworld",
+        "count": 397,
+        "centroidX": -24.301683,
+        "centroidY": -34.37855
+      },
+      {
+        "name": "Vlog",
+        "count": 288,
+        "centroidX": 3.99598895,
+        "centroidY": -6.8937458
+      }
+    ]
   }
 ]

@@ -5,7 +5,39 @@
     "colorHex": "#ff6f61",
     "count": 35804,
     "centroidX": 7.774507,
-    "centroidY": 17.814476
+    "centroidY": 17.814476,
+    "subcategories": [
+      {
+        "name": "Drama & film",
+        "count": 18260,
+        "centroidX": -43.6603375,
+        "centroidY": 58.865184
+      },
+      {
+        "name": "Variety & talk",
+        "count": 11024,
+        "centroidX": 33.7671865,
+        "centroidY": -44.2753295
+      },
+      {
+        "name": "Comedy",
+        "count": 5153,
+        "centroidX": 27.098106,
+        "centroidY": -72.26644
+      },
+      {
+        "name": "Music",
+        "count": 689,
+        "centroidX": 6.3892307,
+        "centroidY": -50.43801
+      },
+      {
+        "name": "Reality TV",
+        "count": 678,
+        "centroidX": 15.437407,
+        "centroidY": -25.193412000000002
+      }
+    ]
   },
   {
     "id": 1,
@@ -13,7 +45,33 @@
     "colorHex": "#e6194b",
     "count": 28447,
     "centroidX": -36.049904,
-    "centroidY": 15.147469
+    "centroidY": 15.147469,
+    "subcategories": [
+      {
+        "name": "Physical sciences",
+        "count": 9525,
+        "centroidX": -39.480537,
+        "centroidY": 24.109035
+      },
+      {
+        "name": "Maths & statistics",
+        "count": 8896,
+        "centroidX": -59.258382,
+        "centroidY": -31.452402499999998
+      },
+      {
+        "name": "Biology",
+        "count": 7614,
+        "centroidX": -5.3235955,
+        "centroidY": 41.829546500000006
+      },
+      {
+        "name": "Environment",
+        "count": 2412,
+        "centroidX": 8.8614295,
+        "centroidY": 36.271549500000006
+      }
+    ]
   },
   {
     "id": 2,
@@ -21,7 +79,39 @@
     "colorHex": "#00b894",
     "count": 9140,
     "centroidX": -22.263117,
-    "centroidY": -53.5746385
+    "centroidY": -53.5746385,
+    "subcategories": [
+      {
+        "name": "Digital skills",
+        "count": 2993,
+        "centroidX": -37.388275,
+        "centroidY": -38.17712
+      },
+      {
+        "name": "Language learning",
+        "count": 2884,
+        "centroidX": -25.454112000000002,
+        "centroidY": -60.200813499999995
+      },
+      {
+        "name": "Culinary skills",
+        "count": 2321,
+        "centroidX": -8.565317,
+        "centroidY": -75.598236
+      },
+      {
+        "name": "Financial skills",
+        "count": 752,
+        "centroidX": 39.182567500000005,
+        "centroidY": -17.7438165
+      },
+      {
+        "name": "DIY & crafts",
+        "count": 190,
+        "centroidX": -17.198265,
+        "centroidY": -5.867357
+      }
+    ]
   },
   {
     "id": 3,
@@ -29,7 +119,27 @@
     "colorHex": "#ffd700",
     "count": 8744,
     "centroidX": 57.505982,
-    "centroidY": 8.119373
+    "centroidY": 8.119373,
+    "subcategories": [
+      {
+        "name": "Political & domestic",
+        "count": 6366,
+        "centroidX": 64.93981500000001,
+        "centroidY": 9.2174555
+      },
+      {
+        "name": "Specialized news",
+        "count": 1912,
+        "centroidX": -1.8281887,
+        "centroidY": 8.720411
+      },
+      {
+        "name": "Business news",
+        "count": 466,
+        "centroidX": 46.203329,
+        "centroidY": -2.68476545
+      }
+    ]
   },
   {
     "id": 4,
@@ -37,7 +147,27 @@
     "colorHex": "#e6beff",
     "count": 7049,
     "centroidX": 46.19974,
-    "centroidY": 44.890972
+    "centroidY": 44.890972,
+    "subcategories": [
+      {
+        "name": "Law",
+        "count": 5433,
+        "centroidX": 50.40686,
+        "centroidY": 50.666794
+      },
+      {
+        "name": "Management & operations",
+        "count": 992,
+        "centroidX": 28.882292,
+        "centroidY": -14.589321250000001
+      },
+      {
+        "name": "Finance & accounting",
+        "count": 624,
+        "centroidX": 41.2875995,
+        "centroidY": -11.998801
+      }
+    ]
   },
   {
     "id": 5,
@@ -45,7 +175,21 @@
     "colorHex": "#911eb4",
     "count": 6858,
     "centroidX": -11.796299000000001,
-    "centroidY": 29.827657000000002
+    "centroidY": 29.827657000000002,
+    "subcategories": [
+      {
+        "name": "Engineering",
+        "count": 4089,
+        "centroidX": -25.06771,
+        "centroidY": 1.7149204
+      },
+      {
+        "name": "Construction",
+        "count": 2769,
+        "centroidX": 23.872667,
+        "centroidY": 54.844666
+      }
+    ]
   },
   {
     "id": 6,
@@ -53,7 +197,21 @@
     "colorHex": "#4363d8",
     "count": 5943,
     "centroidX": 38.450565,
-    "centroidY": 1.5799372
+    "centroidY": 1.5799372,
+    "subcategories": [
+      {
+        "name": "Economics & politics",
+        "count": 4026,
+        "centroidX": 47.379554999999996,
+        "centroidY": -1.7105478
+      },
+      {
+        "name": "Human behaviour",
+        "count": 1917,
+        "centroidX": 13.035099,
+        "centroidY": 6.472286
+      }
+    ]
   },
   {
     "id": 7,
@@ -61,7 +219,27 @@
     "colorHex": "#ff2ba8",
     "count": 5246,
     "centroidX": 0.43948935,
-    "centroidY": -28.679223
+    "centroidY": -28.679223,
+    "subcategories": [
+      {
+        "name": "Personal vlogging",
+        "count": 2916,
+        "centroidX": 1.1526928,
+        "centroidY": -21.487484000000002
+      },
+      {
+        "name": "Home & food",
+        "count": 1568,
+        "centroidX": -5.2306717,
+        "centroidY": -70.470105
+      },
+      {
+        "name": "Style & appearance",
+        "count": 762,
+        "centroidX": 3.3852640000000003,
+        "centroidY": -38.9237955
+      }
+    ]
   },
   {
     "id": 8,
@@ -69,7 +247,21 @@
     "colorHex": "#f58231",
     "count": 4944,
     "centroidX": 26.380388500000002,
-    "centroidY": 18.169511
+    "centroidY": 18.169511,
+    "subcategories": [
+      {
+        "name": "History & culture",
+        "count": 3441,
+        "centroidX": 27.65572,
+        "centroidY": 23.14978
+      },
+      {
+        "name": "Philosophy & belief",
+        "count": 1503,
+        "centroidX": 24.23287,
+        "centroidY": 9.119342
+      }
+    ]
   },
   {
     "id": 9,
@@ -77,7 +269,15 @@
     "colorHex": "#6c5ce7",
     "count": 4882,
     "centroidX": 15.262591,
-    "centroidY": -12.2422625
+    "centroidY": -12.2422625,
+    "subcategories": [
+      {
+        "name": "Growth",
+        "count": 4882,
+        "centroidX": 15.262591,
+        "centroidY": -12.2422625
+      }
+    ]
   },
   {
     "id": 10,
@@ -85,7 +285,21 @@
     "colorHex": "#46f0f0",
     "count": 3694,
     "centroidX": -8.151643499999999,
-    "centroidY": 18.6926615
+    "centroidY": 18.6926615,
+    "subcategories": [
+      {
+        "name": "Medicine & clinical",
+        "count": 3538,
+        "centroidX": -8.422315,
+        "centroidY": 18.870015000000002
+      },
+      {
+        "name": "Therapy & wellness",
+        "count": 156,
+        "centroidX": -3.57815825,
+        "centroidY": 18.256219
+      }
+    ]
   },
   {
     "id": 11,
@@ -93,7 +307,27 @@
     "colorHex": "#bcf60c",
     "count": 3666,
     "centroidX": 23.381485,
-    "centroidY": -34.846861000000004
+    "centroidY": -34.846861000000004,
+    "subcategories": [
+      {
+        "name": "Performing arts",
+        "count": 1810,
+        "centroidX": 17.2434545,
+        "centroidY": -54.2806765
+      },
+      {
+        "name": "Visual arts",
+        "count": 1196,
+        "centroidX": 31.7764265,
+        "centroidY": 34.7721405
+      },
+      {
+        "name": "Media & design",
+        "count": 660,
+        "centroidX": 4.213840149999999,
+        "centroidY": -10.8323635
+      }
+    ]
   },
   {
     "id": 12,
@@ -101,7 +335,15 @@
     "colorHex": "#1e90ff",
     "count": 3015,
     "centroidX": -81.59192,
-    "centroidY": -1.5676928
+    "centroidY": -1.5676928,
+    "subcategories": [
+      {
+        "name": "Video gaming",
+        "count": 3015,
+        "centroidX": -81.59192,
+        "centroidY": -1.5676928
+      }
+    ]
   },
   {
     "id": 13,
@@ -109,7 +351,21 @@
     "colorHex": "#55efc4",
     "count": 2951,
     "centroidX": 5.091438,
-    "centroidY": 6.9582105
+    "centroidY": 6.9582105,
+    "subcategories": [
+      {
+        "name": "Mental wellness",
+        "count": 1994,
+        "centroidX": 7.08198385,
+        "centroidY": 7.20809485
+      },
+      {
+        "name": "Physical wellness",
+        "count": 957,
+        "centroidX": -11.455211,
+        "centroidY": 6.612238
+      }
+    ]
   },
   {
     "id": 14,
@@ -117,7 +373,15 @@
     "colorHex": "#f032e6",
     "count": 2935,
     "centroidX": -13.128809,
-    "centroidY": -35.285347
+    "centroidY": -35.285347,
+    "subcategories": [
+      {
+        "name": "Education & teaching",
+        "count": 2935,
+        "centroidX": -13.128809,
+        "centroidY": -35.285347
+      }
+    ]
   },
   {
     "id": 15,
@@ -125,7 +389,15 @@
     "colorHex": "#fabebe",
     "count": 2165,
     "centroidX": -32.0069,
-    "centroidY": -32.22559
+    "centroidY": -32.22559,
+    "subcategories": [
+      {
+        "name": "IT & computing",
+        "count": 2165,
+        "centroidX": -32.0069,
+        "centroidY": -32.22559
+      }
+    ]
   },
   {
     "id": 16,
@@ -133,7 +405,21 @@
     "colorHex": "#a29bfe",
     "count": 2057,
     "centroidX": -16.303644,
-    "centroidY": -14.586511
+    "centroidY": -14.586511,
+    "subcategories": [
+      {
+        "name": "Consumer content",
+        "count": 1569,
+        "centroidX": -18.43667,
+        "centroidY": -15.844159
+      },
+      {
+        "name": "Internet culture",
+        "count": 488,
+        "centroidX": 1.0605932,
+        "centroidY": -0.25729398000000003
+      }
+    ]
   },
   {
     "id": 17,
@@ -141,7 +427,15 @@
     "colorHex": "#fffac8",
     "count": 1375,
     "centroidX": -4.8087435,
-    "centroidY": -44.063152
+    "centroidY": -44.063152,
+    "subcategories": [
+      {
+        "name": "Languages",
+        "count": 1375,
+        "centroidX": -4.8087435,
+        "centroidY": -44.063152
+      }
+    ]
   },
   {
     "id": 18,
@@ -149,7 +443,27 @@
     "colorHex": "#00cec9",
     "count": 1202,
     "centroidX": 47.612576000000004,
-    "centroidY": -16.5415985
+    "centroidY": -16.5415985,
+    "subcategories": [
+      {
+        "name": "Organized sports",
+        "count": 815,
+        "centroidX": 50.996277,
+        "centroidY": -17.861687
+      },
+      {
+        "name": "Adventure & extreme",
+        "count": 346,
+        "centroidX": -2.3652552,
+        "centroidY": -6.78630905
+      },
+      {
+        "name": "Other sports",
+        "count": 41,
+        "centroidX": -6.8652377,
+        "centroidY": -2.1099484
+      }
+    ]
   },
   {
     "id": 19,
@@ -157,7 +471,15 @@
     "colorHex": "#800000",
     "count": 420,
     "centroidX": 27.6934085,
-    "centroidY": 1.9256112
+    "centroidY": 1.9256112,
+    "subcategories": [
+      {
+        "name": "Religion & spirituality",
+        "count": 420,
+        "centroidX": 27.6934085,
+        "centroidY": 1.9256112
+      }
+    ]
   },
   {
     "id": 20,
@@ -165,7 +487,15 @@
     "colorHex": "#008080",
     "count": 14,
     "centroidX": 4.1067335499999995,
-    "centroidY": 32.856218
+    "centroidY": 32.856218,
+    "subcategories": [
+      {
+        "name": "Agriculture",
+        "count": 14,
+        "centroidX": 4.1067335499999995,
+        "centroidY": 32.856218
+      }
+    ]
   },
   {
     "id": 21,
@@ -173,6 +503,14 @@
     "colorHex": "#555555",
     "count": 3,
     "centroidX": 32.996532,
-    "centroidY": 35.24525
+    "centroidY": 35.24525,
+    "subcategories": [
+      {
+        "name": "Uncategorized",
+        "count": 3,
+        "centroidX": 32.996532,
+        "centroidY": 35.24525
+      }
+    ]
   }
 ]

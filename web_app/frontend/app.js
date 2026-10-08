@@ -389,7 +389,7 @@ class TSNEVisualization {
 
         const ctx = this.ctx;
 
-        ctx.fillStyle = '#000000';
+        ctx.fillStyle = '#fdfcf9';
         ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
         ctx.save();
@@ -430,8 +430,8 @@ class TSNEVisualization {
                 if (isolating) {
                     continue; // hidden entirely while isolated
                 }
-                ctx.fillStyle = '#3a3a3a';
-                ctx.globalAlpha = 0.25;
+                ctx.fillStyle = '#c9c5b8';
+                ctx.globalAlpha = 0.5;
                 ctx.beginPath();
                 ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
                 ctx.fill();
@@ -470,8 +470,8 @@ class TSNEVisualization {
                 const maxCount = Math.max(...subs.map(s => s.count));
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.strokeStyle = 'rgba(0,0,0,0.9)';
-                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = 'rgba(253,252,249,0.9)';
+                ctx.fillStyle = '#17171a';
                 for (const sub of subs) {
                     const [x, y] = this.projectToCanvas(sub.centroidX, sub.centroidY);
                     const weight = Math.sqrt(sub.count / maxCount); // 0..1
@@ -487,8 +487,8 @@ class TSNEVisualization {
             // keeps the base view clean like the paper figure (legend
             // carries names at rest).
             ctx.globalAlpha = Math.min(1, (this.scale - this.LABEL_MIN_SCALE) / 0.6);
-            ctx.fillStyle = '#ffffff';
-            ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+            ctx.fillStyle = '#17171a';
+            ctx.strokeStyle = 'rgba(253,252,249,0.85)';
             ctx.lineWidth = 3 / this.scale;
             ctx.font = `${13 / this.scale}px sans-serif`;
             ctx.textAlign = 'center';
@@ -504,7 +504,7 @@ class TSNEVisualization {
         if (this.hoveredPoint) {
             const [x, y] = this.projectToCanvas(this.xs[this.hoveredPoint.index], this.ys[this.hoveredPoint.index]);
             ctx.globalAlpha = 1;
-            ctx.strokeStyle = '#ffffff';
+            ctx.strokeStyle = '#17171a';
             ctx.lineWidth = 2 / this.scale;
             ctx.beginPath();
             ctx.arc(x, y, (dotRadius + 3 / this.scale), 0, Math.PI * 2);
@@ -516,7 +516,7 @@ class TSNEVisualization {
             // without needing a second accent color.
             const [x, y] = this.projectToCanvas(this.xs[this.selectedPoint.index], this.ys[this.selectedPoint.index]);
             ctx.globalAlpha = 1;
-            ctx.strokeStyle = '#ffffff';
+            ctx.strokeStyle = '#17171a';
             ctx.lineWidth = 1.5 / this.scale;
             ctx.beginPath();
             ctx.arc(x, y, (dotRadius + 3 / this.scale), 0, Math.PI * 2);

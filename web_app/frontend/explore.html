@@ -10,11 +10,19 @@
                serif for the paper's own voice (title), sans for UI chrome,
                mono for anything numeric (counts, stats) - a small nod to a
                lab-instrument register rather than a SaaS dashboard. No
-               accent color: the only color in this app is the data itself,
-               so the interface stays entirely on a gray scale. */
+               accent color in the UI chrome itself: the only color is the
+               data (legend swatches, plotted points) and the paper's own
+               cream/ink palette shared with the Findings and Supplementary
+               tabs, so all three pages read as one site. */
             --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
             --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
             --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+
+            --ink: #17171a;
+            --ink-soft: #52525b;
+            --paper: #fdfcf9;
+            --paper-raised: #ffffff;
+            --line: #e7e4db;
         }
 
         * {
@@ -24,8 +32,8 @@
         }
 
         body {
-            background-color: #000000;
-            color: #e0e0e0;
+            background-color: var(--paper);
+            color: var(--ink);
             font-family: var(--font-sans);
             overflow: hidden;
         }
@@ -179,7 +187,7 @@
 
         .visualization-panel {
             position: relative;
-            background: #000000;
+            background: var(--paper);
             flex: 0 0 auto;
             height: 100%;
             aspect-ratio: 1 / 1;
@@ -216,11 +224,12 @@
             right: 20px;
             display: flex;
             flex-direction: column;
-            background: #111;
-            border: 1px solid #222;
+            background: var(--paper-raised);
+            border: 1px solid var(--line);
             border-radius: 7px;
             overflow: hidden;
             z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         .control-btn {
@@ -228,8 +237,8 @@
             height: 36px;
             background: transparent;
             border: none;
-            border-bottom: 1px solid #222;
-            color: #999;
+            border-bottom: 1px solid var(--line);
+            color: var(--ink-soft);
             font-family: var(--font-mono);
             font-size: 15px;
             cursor: pointer;
@@ -244,14 +253,14 @@
         }
 
         .control-btn:hover {
-            background: #1e1e1e;
-            color: #fff;
+            background: #f1efe6;
+            color: var(--ink);
         }
 
         .info-panel {
             width: 400px;
-            background: #151515;
-            border-left: 1px solid #333;
+            background: var(--paper-raised);
+            border-left: 1px solid var(--line);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
@@ -262,8 +271,8 @@
            to sit above the per-video info you're looking at constantly. */
         .legend-panel {
             width: 280px;
-            background: #151515;
-            border-right: 1px solid #333;
+            background: var(--paper-raised);
+            border-right: 1px solid var(--line);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
@@ -271,12 +280,12 @@
 
         .panel-section {
             padding: 20px;
-            border-bottom: 1px solid #222;
+            border-bottom: 1px solid var(--line);
         }
 
         .panel-section h3 {
             font-size: 14px;
-            color: #888;
+            color: var(--ink-soft);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 15px;
@@ -328,25 +337,25 @@
 
         .metadata-label {
             font-size: 11px;
-            color: #666;
+            color: var(--ink-soft);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .metadata-value {
             font-size: 14px;
-            color: #ddd;
+            color: var(--ink);
             word-break: break-word;
         }
 
         .metadata-value a {
-            color: #ccc;
+            color: #3a3a3a;
             text-decoration: none;
-            border-bottom: 1px solid #444;
+            border-bottom: 1px solid #c9c5b8;
         }
 
         .metadata-value a:hover {
-            color: #fff;
+            color: #000;
             border-color: #999;
         }
 
@@ -361,10 +370,10 @@
         .category-badge {
             display: inline-block;
             padding: 2px 9px;
-            border: 1px solid #3a3a3a;
+            border: 1px solid #c9c5b8;
             border-radius: 3px;
             font-size: 11.5px;
-            color: #ccc;
+            color: var(--ink);
         }
 
         .tag-path-list {
@@ -376,7 +385,7 @@
 
         .tag-path {
             font-size: 11px;
-            color: #999;
+            color: var(--ink-soft);
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -388,11 +397,11 @@
         }
 
         .tag-crumb:last-child {
-            color: #ddd;
+            color: var(--ink);
         }
 
         .tag-sep {
-            color: #555;
+            color: #999;
         }
 
         .stats-row {
@@ -402,7 +411,7 @@
 
         .stat-item {
             flex: 1;
-            background: #1a1a1a;
+            background: #f1efe6;
             padding: 10px;
             border-radius: 6px;
             text-align: center;
@@ -412,12 +421,12 @@
             font-family: var(--font-mono);
             font-size: 16px;
             font-weight: 600;
-            color: #f0f0f0;
+            color: var(--ink);
         }
 
         .stat-label {
             font-size: 10px;
-            color: #666;
+            color: var(--ink-soft);
             text-transform: uppercase;
             margin-top: 4px;
         }
@@ -433,8 +442,8 @@
         .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid #2a2a2a;
-            border-top-color: #ccc;
+            border: 3px solid var(--line);
+            border-top-color: var(--ink);
             border-radius: 50%;
             animation: spin 0.9s linear infinite;
         }
@@ -445,12 +454,12 @@
 
         .loading-text {
             margin-top: 20px;
-            color: #666;
+            color: var(--ink-soft);
             font-size: 14px;
         }
 
         .placeholder {
-            color: #555;
+            color: #999;
             font-size: 13px;
             text-align: center;
             padding: 40px 20px;
@@ -458,33 +467,33 @@
 
         .search-container {
             padding: 15px 20px;
-            background: #1a1a1a;
-            border-bottom: 1px solid #222;
+            background: #f1efe6;
+            border-bottom: 1px solid var(--line);
         }
 
         .search-input {
             width: 100%;
             padding: 10px 15px;
-            background: #0a0a0a;
-            border: 1px solid #333;
+            background: #ffffff;
+            border: 1px solid #d8d5c8;
             border-radius: 6px;
-            color: #ddd;
+            color: var(--ink);
             font-size: 14px;
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #777;
+            border-color: #999;
         }
 
         .video-count {
             font-size: 12px;
-            color: #666;
+            color: var(--ink-soft);
         }
 
         .legend-hint {
             font-size: 10.5px;
-            color: #555;
+            color: #999;
             margin-bottom: 8px;
         }
 
@@ -501,7 +510,7 @@
             align-items: center;
             gap: 8px;
             font-size: 12px;
-            color: #ccc;
+            color: var(--ink);
             padding: 3px 6px;
             margin: 0 -6px;
             border-radius: 5px;
@@ -511,14 +520,14 @@
         }
 
         .legend-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
+            background: rgba(0, 0, 0, 0.05);
+            color: #000;
         }
 
         .legend-item.isolated {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-            color: #fff;
+            background: rgba(0, 0, 0, 0.06);
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #000;
         }
 
         .legend-item.isolated .legend-name {
@@ -541,12 +550,12 @@
 
         .legend-count {
             font-family: var(--font-mono);
-            color: #666;
+            color: var(--ink-soft);
             font-size: 11px;
         }
 
         .placeholder-inline {
-            color: #555;
+            color: #999;
             font-size: 12px;
         }
 
@@ -554,13 +563,13 @@
             display: none;
             position: fixed;
             z-index: 1000;
-            background: #141414;
-            border: 1px solid #2a2a2a;
+            background: var(--paper-raised);
+            border: 1px solid var(--line);
             border-radius: 8px;
             padding: 10px 12px;
             min-width: 170px;
             max-width: 260px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
             pointer-events: none;
         }
 
@@ -570,10 +579,10 @@
             gap: 7px;
             font-size: 12.5px;
             font-weight: 600;
-            color: #fff;
+            color: var(--ink);
             margin-bottom: 8px;
             padding-bottom: 8px;
-            border-bottom: 1px solid #262626;
+            border-bottom: 1px solid var(--line);
         }
 
         .legend-tooltip-row {
@@ -581,13 +590,13 @@
             justify-content: space-between;
             gap: 10px;
             font-size: 12px;
-            color: #ccc;
+            color: #3a3a3a;
             padding: 2px 0;
         }
 
         .legend-tooltip-count {
             font-family: var(--font-mono);
-            color: #777;
+            color: var(--ink-soft);
         }
     </style>
 </head>

@@ -51,18 +51,18 @@
             border-bottom: 1px solid #1c1c1c;
         }
 
-        /* Flush to the viewport's right edge, same as .info-panel's own
-           right edge below it (.info-panel has no padding of its own -
-           .panel-section's 20px padding is inside it - so .info-panel's
-           scrollbar, when it has one, renders right at that flush edge,
-           not 20px in from it. Content's right edge lines up with that.
-           Left edge keeps the original 30px header padding. */
+        /* Same max-width/centering/padding as Findings and Supplementary's
+           .header-content, so the masthead lines up identically across all
+           three tabs. */
         .header-content {
+            max-width: 1180px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 24px;
-            padding: 0 0 0 30px;
+            padding: 0 30px;
+            flex-wrap: wrap;
         }
 
         .header-text {
@@ -268,22 +268,51 @@
 
         /* Mirrors .info-panel on the other side of the plot - the legend
            is reference material you check in on, not something that needs
-           to sit above the per-video info you're looking at constantly. */
+           to sit above the per-video info you're looking at constantly.
+           Unlike .info-panel, this one doesn't scroll as a whole: the
+           toggle and heading stay fixed at top, and only .legend-scroll
+           below them scrolls, with its own always-visible scrollbar, so
+           it's obvious there's more to see without a capped inner box. */
         .legend-panel {
             width: 280px;
             background: var(--paper-raised);
             border-right: 1px solid var(--line);
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
+            overflow: hidden;
         }
+
+        .legend-toggle-row {
+            padding: 16px 20px 0;
+            flex: 0 0 auto;
+        }
+
+        .legend-header {
+            padding: 14px 20px 0;
+            flex: 0 0 auto;
+        }
+
+        .legend-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: scroll;
+            padding: 0 20px 20px;
+            scrollbar-gutter: stable;
+            scrollbar-width: thin;
+            scrollbar-color: #d8d5c8 transparent;
+        }
+
+        .legend-scroll::-webkit-scrollbar { width: 8px; }
+        .legend-scroll::-webkit-scrollbar-track { background: transparent; }
+        .legend-scroll::-webkit-scrollbar-thumb { background: #d8d5c8; border-radius: 4px; }
+        .legend-scroll::-webkit-scrollbar-thumb:hover { background: #c3bfab; }
 
         .panel-section {
             padding: 20px;
             border-bottom: 1px solid var(--line);
         }
 
-        .panel-section h3 {
+        .panel-section h3, .legend-header h3 {
             font-size: 14px;
             color: var(--ink-soft);
             text-transform: uppercase;
@@ -494,12 +523,10 @@
         .legend-hint {
             font-size: 10.5px;
             color: #999;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .legend-list {
-            max-height: 220px;
-            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 6px;
@@ -605,7 +632,7 @@
         <div class="header">
             <div class="header-content">
                 <div class="header-text">
-                    <div class="eyebrow">Supplementary &middot; interactive corpus explorer</div>
+                    <div class="eyebrow">63,505 videos, mapped and browsable</div>
                     <div class="title">The Attention Trap in Online Education Videos</div>
                     <div class="byline">
                         <span>Nikhil Kuppa, Melanie Adler, Lucas C. Parra, Jens Madsen</span>
@@ -621,18 +648,22 @@
                     <a href="supplementary.html">Supplementary</a>
                     <a href="explore.html" class="active">Explore the data</a>
                 </div>
-                <div class="classification-toggle">
-                    <button class="toggle-btn active" data-classification="format">Format</button>
-                    <button class="toggle-btn" data-classification="content">Content</button>
-                </div>
             </div>
         </div>
 
         <div class="main-content">
             <div class="legend-panel">
-                <div class="panel-section">
+                <div class="legend-toggle-row">
+                    <div class="classification-toggle">
+                        <button class="toggle-btn active" data-classification="format">Format</button>
+                        <button class="toggle-btn" data-classification="content">Content</button>
+                    </div>
+                </div>
+                <div class="legend-header">
                     <h3>Legend</h3>
                     <div class="legend-hint">Hover to preview &middot; click to isolate</div>
+                </div>
+                <div class="legend-scroll">
                     <div class="legend-list" id="legend-list"></div>
                 </div>
             </div>

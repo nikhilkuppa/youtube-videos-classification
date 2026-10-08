@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Attention Trap in Online Education Videos</title>
+    <style>
+        :root {
+            /* Three deliberate stacks instead of one generic system list:
+               serif for the paper's own voice (title), sans for UI chrome,
+               mono for anything numeric (counts, stats) - a small nod to a
+               lab-instrument register rather than a SaaS dashboard. No
+               accent color: the only color in this app is the data itself,
+               so the interface stays entirely on a gray scale. */
+            --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+            --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+            --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #e0e0e0;
+            font-family: var(--font-sans);
+            overflow: hidden;
+        }
+
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #050505;
+            padding: 18px 0;
+            border-bottom: 1px solid #1c1c1c;
+        }
+
+        /* Flush to the viewport's right edge, same as .info-panel's own
+           right edge below it (.info-panel has no padding of its own -
+           .panel-section's 20px padding is inside it - so .info-panel's
+           scrollbar, when it has one, renders right at that flush edge,
+           not 20px in from it. Content's right edge lines up with that.
+           Left edge keeps the original 30px header padding. */
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+            padding: 0 0 0 30px;
+        }
+
+        .header-text {
+            min-width: 0;
+        }
+
+        .eyebrow {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: #6a6a6a;
+            margin-bottom: 4px;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0.1px;
+            color: #f2f2f2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .byline {
+            font-size: 11.5px;
+            color: #777;
+            margin-top: 5px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .byline .sep {
+            color: #444;
+        }
+
+        #video-count {
+            font-family: var(--font-mono);
+        }
+
+        .byline a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .byline a:hover {
+            color: #e0e0e0;
+            border-color: #999;
+        }
+
+        .page-nav {
+            display: flex;
+            gap: 2px;
+            background: #111;
+            padding: 3px;
+            border-radius: 7px;
+            border: 1px solid #222;
+            flex: 0 0 auto;
+        }
+
+        .page-nav a {
+            padding: 7px 16px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            color: #777;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .page-nav a:hover {
+            background: #1e1e1e;
+            color: #ccc;
+        }
+
+        .page-nav a.active {
+            background: #e8e8e8;
+            color: #0a0a0a;
+        }
+
+        .classification-toggle {
+            display: flex;
+            gap: 2px;
+            background: #111;
+            padding: 3px;
+            border-radius: 7px;
+            border: 1px solid #222;
+            flex: 0 0 auto;
+        }
+
+        .toggle-btn {
+            padding: 7px 18px;
+            border: none;
+            background: transparent;
+            color: #777;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .toggle-btn.active {
+            background: #e8e8e8;
+            color: #0a0a0a;
+        }
+
+        .toggle-btn:hover:not(.active) {
+            background: #1e1e1e;
+            color: #ccc;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .visualization-panel {
+            position: relative;
+            background: #000000;
+            flex: 0 0 auto;
+            height: 100%;
+            aspect-ratio: 1 / 1;
+            /* auto margins (not justify-content on the row) so the square
+               plot centers in the actual leftover space between the two
+               side panels, even though they're different widths (280px vs
+               400px) - justify-content:center would center the 3-item
+               group as a block instead, throwing the plot off-center. */
+            margin: 0 auto;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            cursor: grab;
+        }
+
+        #canvas-container.grabbing {
+            cursor: grabbing;
+        }
+
+        #tsne-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* One joined bar, same visual language as the classification
+           toggle, instead of three separate floating glass pills. */
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 7px;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #222;
+            color: #999;
+            font-family: var(--font-mono);
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:last-child {
+            border-bottom: none;
+        }
+
+        .control-btn:hover {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        .info-panel {
+            width: 400px;
+            background: #151515;
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Mirrors .info-panel on the other side of the plot - the legend
+           is reference material you check in on, not something that needs
+           to sit above the per-video info you're looking at constantly. */
+        .legend-panel {
+            width: 280px;
+            background: #151515;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            padding: 20px;
+            border-bottom: 1px solid #222;
+        }
+
+        .panel-section h3 {
+            font-size: 14px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .video-embed {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .video-embed iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .thumbnail-preview {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+        }
+
+        .thumbnail-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .metadata {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .metadata-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metadata-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metadata-value {
+            font-size: 14px;
+            color: #ddd;
+            word-break: break-word;
+        }
+
+        .metadata-value a {
+            color: #ccc;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+
+        .metadata-value a:hover {
+            color: #fff;
+            border-color: #999;
+        }
+
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        /* Plain text chip, not a filled pill - the legend is where color
+           actually means something; here it would just be decoration. */
+        .category-badge {
+            display: inline-block;
+            padding: 2px 9px;
+            border: 1px solid #3a3a3a;
+            border-radius: 3px;
+            font-size: 11.5px;
+            color: #ccc;
+        }
+
+        .tag-path-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .tag-path {
+            font-size: 11px;
+            color: #999;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .tag-crumb {
+            white-space: nowrap;
+        }
+
+        .tag-crumb:last-child {
+            color: #ddd;
+        }
+
+        .tag-sep {
+            color: #555;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .stat-item {
+            flex: 1;
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 600;
+            color: #f0f0f0;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #2a2a2a;
+            border-top-color: #ccc;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .placeholder {
+            color: #555;
+            font-size: 13px;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .search-container {
+            padding: 15px 20px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #222;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #ddd;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #777;
+        }
+
+        .video-count {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .legend-hint {
+            font-size: 10.5px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .legend-list {
+            max-height: 220px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #ccc;
+            padding: 3px 6px;
+            margin: 0 -6px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .legend-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        .legend-item.isolated {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .legend-item.isolated .legend-name {
+            font-weight: 600;
+        }
+
+        .legend-swatch {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex: 0 0 auto;
+        }
+
+        .legend-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .legend-count {
+            font-family: var(--font-mono);
+            color: #666;
+            font-size: 11px;
+        }
+
+        .placeholder-inline {
+            color: #555;
+            font-size: 12px;
+        }
+
+        .legend-tooltip {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 10px 12px;
+            min-width: 170px;
+            max-width: 260px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        .legend-tooltip-header {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #262626;
+        }
+
+        .legend-tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 12px;
+            color: #ccc;
+            padding: 2px 0;
+        }
+
+        .legend-tooltip-count {
+            font-family: var(--font-mono);
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="header-content">
+                <div class="header-text">
+                    <div class="eyebrow">Supplementary &middot; interactive corpus explorer</div>
+                    <div class="title">The Attention Trap in Online Education Videos</div>
+                    <div class="byline">
+                        <span>Nikhil Kuppa, Melanie Adler, Lucas C. Parra, Jens Madsen</span>
+                        <span class="sep">&middot;</span>
+                        <!-- once published, set href to the real DOI URL and add target="_blank" rel="noopener" -->
+                        <a id="doi-link" href="javascript:void(0)">DOI: pending</a>
+                        <span class="sep">&middot;</span>
+                        <span id="video-count">Loading&hellip;</span>
+                    </div>
+                </div>
+                <div class="page-nav">
+                    <a href="index.html">Findings</a>
+                    <a href="explore.html" class="active">Explore the data</a>
+                </div>
+                <div class="classification-toggle">
+                    <button class="toggle-btn active" data-classification="format">Format</button>
+                    <button class="toggle-btn" data-classification="content">Content</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="legend-panel">
+                <div class="panel-section">
+                    <h3>Legend</h3>
+                    <div class="legend-hint">Hover to preview &middot; click to isolate</div>
+                    <div class="legend-list" id="legend-list"></div>
+                </div>
+            </div>
+
+            <div class="visualization-panel">
+                <div id="canvas-container">
+                    <canvas id="tsne-canvas"></canvas>
+                    <div class="loading" id="loading">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Loading visualization...</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="control-btn" id="zoom-in" title="Zoom In">+</button>
+                    <button class="control-btn" id="zoom-out" title="Zoom Out">−</button>
+                    <button class="control-btn" id="reset-view" title="Reset View">⟲</button>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="search-input" placeholder="Search videos, channels, categories...">
+                </div>
+
+                <div class="panel-section">
+                    <h3>On Hover</h3>
+                    <div class="thumbnail-preview" id="thumbnail-preview">
+                        <div class="placeholder">Hover over a dot</div>
+                    </div>
+                    <div class="metadata" id="hover-metadata">
+                        <div class="placeholder">Hover over a dot to see details</div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>Selected Video</h3>
+                    <div class="video-embed" id="video-embed">
+                        <div class="placeholder">Click a dot to play video</div>
+                    </div>
+                    <div class="metadata" id="selected-metadata">
+                        <div class="placeholder">Click a dot to see details</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="legend-tooltip" id="legend-tooltip"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

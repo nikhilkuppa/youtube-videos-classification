@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Supplementary Information &mdash; The Attention Trap in Online Education Videos</title>
+<title>Supplementary Information: The Attention Trap in Online Education Videos</title>
 <link rel="stylesheet" href="findings.css">
 </head>
 <body>
@@ -31,12 +31,20 @@
     <div class="hero-kicker">Supplementary information</div>
     <h1>How the corpus was validated, how the four metrics were built, and how the experiment was designed</h1>
     <p>
-        This page summarizes the methods and validation checks behind the findings &mdash; how topic
+        This page summarizes the methods and validation checks behind the findings: how topic
         and format labels were checked against ground truth, how coherence, segmentation, guidance and
         personalization are computed, how those metrics were validated, and how the 40 experiment
         videos were selected from the corpus.
     </p>
 </div>
+
+<nav class="section-nav" id="section-nav">
+    <a href="#si-annotation">Annotation validation</a>
+    <a href="#si-construction">Metric construction</a>
+    <a href="#si-validation">Metric validation</a>
+    <a href="#si-selection">Experiment selection</a>
+    <a href="#si-quiz">Quiz &amp; survey sample</a>
+</nav>
 
 <!-- SI Note 1 -->
 <section class="finding" id="si-annotation">
@@ -100,7 +108,7 @@
         </div>
         <div class="metric-card personalization">
             <h3>Personalization</h3>
-            <p>LLM-scored degree of conversational phrasing, direct address, relatable examples and learner-oriented framing &mdash; explanatory style, not production value or entertainment value.</p>
+            <p>LLM-scored degree of conversational phrasing, direct address, relatable examples and learner-oriented framing: explanatory style, not production value or entertainment value.</p>
         </div>
     </div>
     <figure>
@@ -115,7 +123,7 @@
     <h2>Validating the four metrics before using them for anything</h2>
     <p>
         <strong>Perturbation test.</strong> Three synthetic paragraphs were built with deliberately
-        varying sentence-level structure &mdash; coherent (minimal randomness), incoherent (highly
+        varying sentence-level structure: coherent (minimal randomness), incoherent (highly
         disjointed) and realistic (natural thematic progression). The coherence metric recovered the
         expected ordering exactly: coherent texts scored 0.87 with zero detected segments, incoherent
         texts scored 0.25 with many detected segments, and realistic texts scored 0.54 with evenly
@@ -167,9 +175,9 @@
     <p>
         Candidate videos were restricted to instructional formats, 6&ndash;10 minutes long, with
         entertainment/gaming/children's channels and non-instructional formats (vlogs, panels, skits,
-        interviews) excluded. Pairs were then built separately for each metric &mdash; processed in the
+        interviews) excluded. Pairs were then built separately for each metric, processed in the
         order guidance, segmentation, coherence, personalization, with videos already used in one pair
-        withheld from later passes &mdash; requiring topical similarity &ge; 0.90 and matched duration,
+        withheld from later passes. Matching required topical similarity &ge; 0.90 and matched duration,
         speech rate, publication year and scene-cut rate.
     </p>
     <p>
@@ -178,7 +186,7 @@
         maximum-weight matching algorithm then selected the best non-overlapping set of pairs. In the
         final 40-video set (5 high / 5 low per dimension), mean target-dimension effect sizes ranged
         from <strong>d = 1.31 to 2.35</strong>, against <strong>d = 0.26 to 0.47</strong> on non-target
-        dimensions &mdash; confirming pairs varied mainly along the dimension they were selected for.
+        dimensions, confirming pairs varied mainly along the dimension they were selected for.
     </p>
     <figure>
         <img src="assets/figures/sfig5-selection-effectsizes.png" alt="Supplementary Figure S5: distribution of normalized metric scores across the filtered experimental pool, and target vs. confound effect sizes for the final selected pairs.">
@@ -199,7 +207,7 @@
     </p>
     <p>Participant characteristics for the 1,378-student survey behind Fig. 1:</p>
     <table class="wmc-table">
-        <tr><th>Characteristic</th><th>Breakdown</th></tr>
+        <tr><th>Characteristic</th><th style="text-align:right">Breakdown</th></tr>
         <tr><td>Age</td><td class="num">mean 26.2 (SD 8.8), median 23, range 16&ndash;74</td></tr>
         <tr><td>Sex</td><td class="num">59.5% female &middot; 40.5% male</td></tr>
         <tr><td>Native language</td><td class="num">87.4% English</td></tr>
@@ -225,7 +233,7 @@
         </div>
         <div class="footer-col">
             <h4>Code</h4>
-            <div><a href="https://github.com/nikhilkuppa/attention-trap" target="_blank" rel="noopener">attention-trap</a> &mdash; figures &amp; analysis</div>
+            <div><a href="https://github.com/nikhilkuppa/attention-trap" target="_blank" rel="noopener">attention-trap</a>: figures &amp; analysis</div>
         </div>
         <div class="footer-col">
             <h4>More</h4>
@@ -234,6 +242,38 @@
         </div>
     </div>
 </footer>
+
+<script>
+    // Highlights the section-nav pill for whichever section is currently in
+    // view, and also snaps to the clicked pill immediately on click rather
+    // than waiting for the scroll to catch up.
+    (function () {
+        const nav = document.getElementById('section-nav');
+        if (!nav) return;
+        const links = Array.from(nav.querySelectorAll('a'));
+        const sections = links
+            .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+            .filter(Boolean);
+
+        function setActive(id) {
+            links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+        }
+
+        links.forEach(a => {
+            a.addEventListener('click', () => setActive(a.getAttribute('href').slice(1)));
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            const visible = entries.filter(e => e.isIntersecting);
+            if (visible.length) {
+                visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+                setActive(visible[0].target.id);
+            }
+        }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+
+        sections.forEach(s => observer.observe(s));
+    })();
+</script>
 
 </body>
 </html>

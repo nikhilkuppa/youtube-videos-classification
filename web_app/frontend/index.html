@@ -34,17 +34,18 @@
         We asked whether the instructional design of an educational video predicts two different
         things: whether students learn from it, and whether it gets watched. Across a student survey,
         a 63,505-video corpus, a 570-student learning experiment and a platform-wide viewership model,
-        the answer was the same &mdash; these two questions have different answers.
+        the answer was the same: these two questions have different answers.
     </p>
 </div>
 
-<nav class="section-nav">
+<nav class="section-nav" id="section-nav">
     <a href="#survey">Survey</a>
     <a href="#corpus">Corpus</a>
     <a href="#metrics">Metrics</a>
     <a href="#experiment">Experiment</a>
     <a href="#wmc">Working memory</a>
     <a href="#viewership">Viewership</a>
+    <a href="#discussion">Discussion</a>
 </nav>
 
 <div class="stat-strip">
@@ -57,10 +58,10 @@
 <!-- Study 1 -->
 <section class="finding" id="survey">
     <div class="finding-kicker" style="background:#fdf6e9;color:var(--guidance)">Study 1 &middot; Survey</div>
-    <h2>Online video is now a mainstream coursework resource &mdash; and students say they pick videos partly for pedagogical reasons</h2>
+    <h2>Online video is now a mainstream coursework resource, and students say they pick videos partly for pedagogical reasons</h2>
     <p>
         In a survey of 1,378 students, YouTube or other educational video platforms were among the
-        most frequently used coursework-help resources (43.3%) &mdash; more commonly selected than
+        most frequently used coursework-help resources (43.3%), more commonly selected than
         classmates (37.3%) or professors (31.0%). The most common goals were to <strong>understand the
         material deeply</strong> (58.7%), prepare for an exam (53.6%) and complete a specific assignment
         (51.8%).
@@ -118,18 +119,18 @@
     <p>
         Coherence, segmentation, guidance and personalization are instructional-design principles that
         have been studied in controlled lab settings but rarely measured at the scale of an actual video
-        platform. We computed all four from each video's transcript &mdash; coherence and segmentation
-        from sentence-embedding structure, guidance and personalization via structured large-language-model
-        scoring &mdash; across all 63,505 videos.
+        platform. We computed all four from each video's transcript across all 63,505 videos: coherence
+        and segmentation from sentence-embedding structure, guidance and personalization via structured
+        large-language-model scoring.
     </p>
     <div class="metric-grid">
         <div class="metric-card guidance">
             <h3>Guidance</h3>
-            <p>Does the video direct attention to what matters &mdash; highlighting key ideas, signalling structure, introducing concepts before using them?</p>
+            <p>Does the video direct attention to what matters: highlighting key ideas, signalling structure, introducing concepts before using them?</p>
         </div>
         <div class="metric-card personalization">
             <h3>Personalization</h3>
-            <p>How conversational the explanation is &mdash; direct address, contractions, natural spoken language versus formal, academic delivery.</p>
+            <p>How conversational the explanation is: direct address, contractions, natural spoken language versus formal, academic delivery.</p>
         </div>
         <div class="metric-card coherence">
             <h3>Coherence</h3>
@@ -191,7 +192,7 @@
     </div>
     <div class="callout c-personalization">
         <strong>Personalization</strong> helped immediately (+3.8 pp) but the benefit mostly disappeared
-        by the delayed quiz (&minus;0.8 pp) &mdash; a conversational style may aid comprehension in the
+        by the delayed quiz (&minus;0.8 pp). A conversational style may aid comprehension in the
         moment without producing durable retention.
     </div>
     <div class="callout c-segmentation">
@@ -208,7 +209,7 @@
 <!-- Working memory -->
 <section class="finding" id="wmc">
     <div class="finding-kicker" style="background:#eaf6f6;color:var(--segmentation)">Study 3 &middot; Working memory</div>
-    <h2>Segmentation hurt low-working-memory students most &mdash; and the advantage of high capacity faded after a week</h2>
+    <h2>Segmentation hurt low-working-memory students most, and the advantage of high capacity faded after a week</h2>
     <p>
         Participants also completed a digit-span working memory capacity (WMC) task. Highly segmented
         videos impaired quiz performance across all capacity groups, but not equally.
@@ -222,7 +223,7 @@
     <p>
         On the immediate quiz, high-WMC students were essentially unaffected by segmentation (+0.9 pp),
         while low-WMC students lost 7.8 percentage points. A week later, though, performance had dropped
-        across every capacity group, including high-WMC students &mdash; the short-term advantage of
+        across every capacity group, including high-WMC students. The short-term advantage of
         higher working memory did not carry over to long-term retention.
     </p>
 </section>
@@ -249,7 +250,7 @@
     </div>
     <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-10px">Change in adjusted R&sup2; when each predictor block is removed from the full viewership model.</p>
     <p>
-        Removing channel reach alone cost the model 0.43 in adjusted R&sup2; &mdash; more than
+        Removing channel reach alone cost the model 0.43 in adjusted R&sup2;, more than
         <strong>80 times</strong> the loss from removing guidance (0.005), the strongest instructional
         predictor, and hundreds of times the loss from removing coherence or segmentation individually.
     </p>
@@ -264,9 +265,45 @@
     </p>
 </section>
 
+<!-- Discussion -->
+<section class="finding" id="discussion">
+    <div class="finding-kicker" style="background:rgba(123,94,167,0.14);color:var(--coherence)">Discussion</div>
+    <h2>Online educational video sits at the intersection of two systems built for different purposes</h2>
+    <p>
+        Students use these videos to resolve confusion, prepare for exams and find explanations that
+        make difficult material easier to grasp. For platforms, visibility of the same videos is
+        governed by channel reach, recommendation algorithms, production style and accumulated
+        attention. A video can be easy to find and widely watched without being the one that best
+        supports learning.
+    </p>
+    <p>
+        The results argue against a simple checklist view of instructional design. Guidance improved
+        both immediate and delayed memory. Personalization helped immediately but the benefit mostly
+        disappeared after a week. Coherence showed little effect in the selected video set, and
+        segmentation was associated with poorer delayed memory. In naturally occurring videos,
+        instructional principles are expressed through varied combinations of content, pacing and
+        production choices, and not all of those expressions are beneficial.
+    </p>
+    <p>
+        Because platform cues signal popularity rather than pedagogy, students cannot reasonably be
+        expected to select videos by instructional quality alone. Instructors can reduce this burden by
+        curating videos and embedding them in instructional sequences. Platforms and educational
+        technology systems could go further by treating instructional design as a ranking signal
+        alongside engagement and reach.
+    </p>
+    <p>
+        This study also has real limits. Instructional quality is not a single scalar property of a
+        video; it depends on content, design, learner characteristics and outcome. The four metrics used
+        here leave out visual and interactional features of instruction, including gesture, diagram
+        quality and animation dynamics, and an external benchmark against one human-annotated dataset
+        showed only weak agreement (Supplementary Note 3). Future work should connect actual student
+        search behavior to learning outcomes and incorporate richer multimodal measures.
+    </p>
+</section>
+
 <div class="cta">
     <h2>See where any one of the 63,505 videos sits</h2>
-    <p>The full corpus, mapped by topic or format and colored by category, is browsable directly &mdash; hover any point for its title, channel and instructional-metric scores.</p>
+    <p>The full corpus, mapped by topic or format and colored by category, is browsable directly: hover any point for its title, channel and instructional-metric scores.</p>
     <a class="cta-btn" href="explore.html">Explore the corpus &rarr;</a>
 </div>
 
@@ -279,7 +316,7 @@
         </div>
         <div class="footer-col">
             <h4>Code</h4>
-            <div><a href="https://github.com/nikhilkuppa/attention-trap" target="_blank" rel="noopener">attention-trap</a> &mdash; figures &amp; analysis</div>
+            <div><a href="https://github.com/nikhilkuppa/attention-trap" target="_blank" rel="noopener">attention-trap</a>: figures &amp; analysis</div>
         </div>
         <div class="footer-col">
             <h4>More</h4>
@@ -288,6 +325,38 @@
         </div>
     </div>
 </footer>
+
+<script>
+    // Highlights the section-nav pill for whichever section is currently in
+    // view, and also snaps to the clicked pill immediately on click rather
+    // than waiting for the scroll to catch up.
+    (function () {
+        const nav = document.getElementById('section-nav');
+        if (!nav) return;
+        const links = Array.from(nav.querySelectorAll('a'));
+        const sections = links
+            .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+            .filter(Boolean);
+
+        function setActive(id) {
+            links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+        }
+
+        links.forEach(a => {
+            a.addEventListener('click', () => setActive(a.getAttribute('href').slice(1)));
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            const visible = entries.filter(e => e.isIntersecting);
+            if (visible.length) {
+                visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+                setActive(visible[0].target.id);
+            }
+        }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+
+        sections.forEach(s => observer.observe(s));
+    })();
+</script>
 
 </body>
 </html>

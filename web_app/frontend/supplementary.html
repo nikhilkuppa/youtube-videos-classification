@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supplementary Information &mdash; The Attention Trap in Online Education Videos</title>
+<link rel="stylesheet" href="findings.css">
+</head>
+<body>
+
+<div class="header">
+    <div class="header-content">
+        <div class="header-text">
+            <div class="eyebrow">City College of New York &middot; Department of Biomedical Engineering</div>
+            <div class="title">The Attention Trap in Online Education Videos</div>
+            <div class="byline">
+                <span>Nikhil Kuppa, Melanie Adler, Lucas C. Parra, Jens Madsen</span>
+                <span class="sep">&middot;</span>
+                <a href="javascript:void(0)">DOI: pending</a>
+            </div>
+        </div>
+        <div class="page-nav">
+            <a href="index.html">Findings</a>
+            <a href="supplementary.html" class="active">Supplementary</a>
+            <a href="explore.html">Explore the data</a>
+        </div>
+    </div>
+</div>
+
+<div class="hero">
+    <div class="hero-kicker">Supplementary information</div>
+    <h1>How the corpus was validated, how the four metrics were built, and how the experiment was designed</h1>
+    <p>
+        This page summarizes the methods and validation checks behind the findings &mdash; how topic
+        and format labels were checked against ground truth, how coherence, segmentation, guidance and
+        personalization are computed, how those metrics were validated, and how the 40 experiment
+        videos were selected from the corpus.
+    </p>
+</div>
+
+<!-- SI Note 1 -->
+<section class="finding" id="si-annotation">
+    <div class="finding-kicker" style="background:#eaf6f6;color:var(--segmentation)">Supplementary Note 1</div>
+    <h2>Corpus annotation validation</h2>
+    <p>
+        Topic and format labels were assigned by a large language model (Gemini 2.0 Flash) from
+        transcripts (topic) and sampled video frames (format), using structured hierarchical taxonomies.
+        Each label was scored independently on a 0&ndash;100 relevance scale rather than forced into a
+        single exclusive category, so a video could score highly on more than one topic or format.
+    </p>
+    <p>
+        <strong>Internal validation</strong> used a focus-volume check: for channels expected to focus
+        on one topic or format, what percentage of their videos actually got that label?
+    </p>
+    <div class="mini-stats">
+        <div class="mini-stat-row"><div class="mini-stat-label">Topic (19 channels)</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:100%;background:var(--segmentation)"></div></div><div class="mini-stat-pct">&ge;50%</div></div>
+        <div class="mini-stat-row"><div class="mini-stat-label">Format (26 channels)</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:87%;background:var(--segmentation)"></div></div><div class="mini-stat-pct">87% avg</div></div>
+    </div>
+    <p>
+        All 19 topic-validation channels and all 26 format-validation channels exceeded 50% focus
+        volume (binomial tests against chance, p = 1.91&times;10&#8315;&#8310; and p = 1.49&times;10&#8315;&#8312;
+        respectively). Format channels averaged 87% &plusmn; 13.2% focus volume.
+    </p>
+    <p>
+        <strong>External validation</strong> compared labels against two independently published,
+        human-annotated reference datasets. Against a 97-video physical-sciences dataset, the model's
+        topic label matched in 61.9% of videos as the top-ranked tag, rising to 74.2% when either of
+        the top two ranked tags counted as a match. Against a human-annotated format dataset, format
+        labels agreed 88.14% &plusmn; 2.85% of the time.
+    </p>
+    <figure>
+        <img src="assets/figures/sfig1-corpus-validation.png" alt="Supplementary Figure S1: internal and external validation of topic and format annotations.">
+        <figcaption><b>Supplementary Fig. S1.</b> a&ndash;b, Internal focus-volume validation for topic and format across selected channels. c, External format validation (confusion matrix). d, External topic validation against a physical-sciences reference dataset.</figcaption>
+    </figure>
+</section>
+
+<!-- SI Note 2 -->
+<section class="finding" id="si-construction">
+    <div class="finding-kicker" style="background:#f4f1f9;color:var(--coherence)">Supplementary Note 2</div>
+    <h2>How coherence, segmentation, guidance and personalization are computed</h2>
+    <p>
+        Each transcript was split into sentences and embedded with Google's text-embedding-004 model
+        (768-dimensional vectors). Coherence and segmentation are computed directly from these
+        embeddings; guidance and personalization are scored by a structured large-language-model prompt.
+        The four were analyzed separately rather than combined into one composite score, since each was
+        expected to relate differently to viewer experience, learning and viewership.
+    </p>
+    <div class="metric-grid">
+        <div class="metric-card coherence">
+            <h3>Coherence</h3>
+            <p><code>mean(CS) &minus; mean(CS) &times; std(CS)</code>, where CS is adjacent-sentence cosine similarity. Rewards high average topical continuity, penalizes large fluctuations.</p>
+        </div>
+        <div class="metric-card segmentation">
+            <h3>Segmentation</h3>
+            <p>Text-tiling over local embedding windows (3 sentences each side) detects candidate section boundaries; the final score balances the number of detected segments against how much one segment dominates the video.</p>
+        </div>
+        <div class="metric-card guidance">
+            <h3>Guidance</h3>
+            <p>Mean of two LLM-scored sub-principles, signalling and pre-training, merged because they were highly correlated across the corpus (r = 0.81) and reflect the same underlying construct.</p>
+        </div>
+        <div class="metric-card personalization">
+            <h3>Personalization</h3>
+            <p>LLM-scored degree of conversational phrasing, direct address, relatable examples and learner-oriented framing &mdash; explanatory style, not production value or entertainment value.</p>
+        </div>
+    </div>
+    <figure>
+        <img src="assets/figures/sfig2-metric-construction.png" alt="Supplementary Figure S2: construction of the coherence and segmentation metrics from transcript sentence embeddings.">
+        <figcaption><b>Supplementary Fig. S2.</b> a, Adjacent-sentence cosine similarity. b, Local-window segment identification. c&ndash;d, The coherence and segmentation formulas.</figcaption>
+    </figure>
+</section>
+
+<!-- SI Note 3 -->
+<section class="finding" id="si-validation">
+    <div class="finding-kicker" style="background:#f4f1f9;color:var(--coherence)">Supplementary Note 3</div>
+    <h2>Validating the four metrics before using them for anything</h2>
+    <p>
+        <strong>Perturbation test.</strong> Three synthetic paragraphs were built with deliberately
+        varying sentence-level structure &mdash; coherent (minimal randomness), incoherent (highly
+        disjointed) and realistic (natural thematic progression). The coherence metric recovered the
+        expected ordering exactly: coherent texts scored 0.87 with zero detected segments, incoherent
+        texts scored 0.25 with many detected segments, and realistic texts scored 0.54 with evenly
+        spaced segments.
+    </p>
+    <p>
+        <strong>Known-contrast genre comparisons.</strong> Channels with genres expected to differ on a
+        given metric were compared directly:
+    </p>
+    <div class="mini-stats">
+        <div class="mini-stat-row"><div class="mini-stat-label">Personalization: comedy</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:86.1%;background:var(--personalization)"></div></div><div class="mini-stat-pct">0.861</div></div>
+        <div class="mini-stat-row"><div class="mini-stat-label">Personalization: news</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:66.5%;background:#8a867a"></div></div><div class="mini-stat-pct">0.665</div></div>
+        <div class="mini-stat-row"><div class="mini-stat-label">Guidance: how-to</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:76%;background:var(--guidance)"></div></div><div class="mini-stat-pct">0.76</div></div>
+        <div class="mini-stat-row"><div class="mini-stat-label">Guidance: comedy</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:14%;background:#8a867a"></div></div><div class="mini-stat-pct">0.14</div></div>
+    </div>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-10px">
+        Comedy vs. news personalization: Welch's t = 4.47, p = 8.34&times;10&#8315;&#8308;. How-to vs. comedy
+        guidance: Welch's t = &minus;19.33, p = 9.1&times;10&#8315;&#185;&#178;.
+    </p>
+    <p>
+        <strong>External benchmark.</strong> Scores were also compared against a 99-video human-annotated
+        physical-chemistry dataset (Magnone et al. 2023). Agreement was weak (coherence &rho; =
+        &minus;0.16, segmentation &rho; = +0.04, guidance &rho; = +0.12, all p &gt; 0.1), which the paper
+        attributes to a genuine methodological gap rather than treating it as disqualifying: our scores
+        are continuous, LLM/embedding-derived and cross-domain, while the reference annotations are
+        binary, consensus-coded and specific to one subject area. The metrics' validity for this study
+        rests on the perturbation tests, genre comparisons and experimental learning outcomes, not on
+        this external benchmark alone.
+    </p>
+    <figure>
+        <img src="assets/figures/sfig3-validation-profiles.png" alt="Supplementary Figure S3: perturbation test results and metric behavior across video formats and topics.">
+        <figcaption><b>Supplementary Fig. S3.</b> a&ndash;b, Perturbation test: coherence and segment detection on synthetic coherent/incoherent/realistic text. c&ndash;d, Mean-centered metric scores across video formats and topics.</figcaption>
+    </figure>
+    <figure>
+        <img src="assets/figures/sfig4-genre-benchmark.png" alt="Supplementary Figure S4: genre comparisons for personalization and guidance, and Bland-Altman agreement with the Magnone external benchmark.">
+        <figcaption><b>Supplementary Fig. S4.</b> a&ndash;b, Channel-level personalization (comedy vs. news) and guidance (how-to vs. comedy) comparisons. c&ndash;h, Bland-Altman and Spearman agreement between computational scores and the Magnone et al. (2023) human annotations.</figcaption>
+    </figure>
+</section>
+
+<!-- SI Note 4 -->
+<section class="finding" id="si-selection">
+    <div class="finding-kicker" style="background:#fdf6e9;color:var(--guidance)">Supplementary Note 4</div>
+    <h2>Selecting the 40 videos for the learning experiment</h2>
+    <p>
+        Before normalizing, coherence was trimmed to its 0.3&ndash;99.9 percentile range and
+        personalization was hard-clipped to [0.30, 0.949]; guidance and segmentation were left
+        untrimmed. All four were then Yeo-Johnson transformed, Z-scored and Min-Max scaled to [0, 1].
+    </p>
+    <p>
+        Candidate videos were restricted to instructional formats, 6&ndash;10 minutes long, with
+        entertainment/gaming/children's channels and non-instructional formats (vlogs, panels, skits,
+        interviews) excluded. Pairs were then built separately for each metric &mdash; processed in the
+        order guidance, segmentation, coherence, personalization, with videos already used in one pair
+        withheld from later passes &mdash; requiring topical similarity &ge; 0.90 and matched duration,
+        speech rate, publication year and scene-cut rate.
+    </p>
+    <p>
+        Each candidate pair needed a target-dimension effect of at least d = 0.60 (Cohen's d analogue)
+        while every non-target dimension stayed below d = 0.50 (relaxed to 0.65 for guidance). A
+        maximum-weight matching algorithm then selected the best non-overlapping set of pairs. In the
+        final 40-video set (5 high / 5 low per dimension), mean target-dimension effect sizes ranged
+        from <strong>d = 1.31 to 2.35</strong>, against <strong>d = 0.26 to 0.47</strong> on non-target
+        dimensions &mdash; confirming pairs varied mainly along the dimension they were selected for.
+    </p>
+    <figure>
+        <img src="assets/figures/sfig5-selection-effectsizes.png" alt="Supplementary Figure S5: distribution of normalized metric scores across the filtered experimental pool, and target vs. confound effect sizes for the final selected pairs.">
+        <figcaption><b>Supplementary Fig. S5.</b> Left, normalized score distributions across the 66,151-video filtered pool. Right, mean target-dimension effect size vs. mean maximum confound across non-target dimensions, per metric.</figcaption>
+    </figure>
+</section>
+
+<!-- SI Note 5 -->
+<section class="finding" id="si-quiz">
+    <div class="finding-kicker" style="background:#fdf6e9;color:var(--guidance)">Supplementary Note 5</div>
+    <h2>Quiz generation and the survey sample</h2>
+    <p>
+        For each of the 40 videos, a large language model generated a 10-question, 4-option multiple-choice
+        quiz, manually reviewed afterward for accuracy and alignment with the video content. To check that
+        questions weren't answerable from prior knowledge alone, a separate baseline group answered the
+        quizzes <em>without watching the videos first</em>; chance performance was 25%, and video pairs
+        whose questions scored too close to chance for either member were re-examined before use.
+    </p>
+    <p>Participant characteristics for the 1,378-student survey behind Fig. 1:</p>
+    <table class="wmc-table">
+        <tr><th>Characteristic</th><th>Breakdown</th></tr>
+        <tr><td>Age</td><td class="num">mean 26.2 (SD 8.8), median 23, range 16&ndash;74</td></tr>
+        <tr><td>Sex</td><td class="num">59.5% female &middot; 40.5% male</td></tr>
+        <tr><td>Native language</td><td class="num">87.4% English</td></tr>
+        <tr><td>Academic level</td><td class="num">70.5% undergraduate &middot; 18.1% master's &middot; 4.6% doctoral</td></tr>
+        <tr><td>Country of origin</td><td class="num">46.2% US &middot; 25.8% UK &middot; 15.3% Canada</td></tr>
+    </table>
+</section>
+
+<div class="cta">
+    <h2>Back to the findings, or into the raw corpus</h2>
+    <p>Read how these methods translate into the paper's four studies, or browse the 63,505-video corpus directly.</p>
+    <a class="cta-btn" href="index.html">&larr; Back to findings</a>
+    &nbsp;&nbsp;
+    <a class="cta-btn" href="explore.html" style="background:transparent;color:var(--ink);border:1px solid var(--line)">Explore the corpus &rarr;</a>
+</div>
+
+<footer>
+    <div class="footer-inner">
+        <div class="footer-col">
+            <h4>Paper</h4>
+            <div>Nikhil Kuppa, Melanie Adler, Lucas C. Parra, Jens Madsen</div>
+            <div>Department of Biomedical Engineering, City College of New York</div>
+        </div>
+        <div class="footer-col">
+            <h4>Code</h4>
+            <div><a href="https://github.com/nikhilkuppa/online-video-classification" target="_blank" rel="noopener">online-video-classification</a> &mdash; classification &amp; metric scoring</div>
+            <div><a href="https://github.com/nikhilkuppa/attention-trap" target="_blank" rel="noopener">attention-trap</a> &mdash; figures &amp; analysis</div>
+        </div>
+        <div class="footer-col">
+            <h4>More</h4>
+            <div><a href="index.html">Findings</a></div>
+            <div><a href="explore.html">Interactive video corpus map</a></div>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

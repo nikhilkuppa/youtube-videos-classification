@@ -12,11 +12,11 @@
         --coherence: #7b5ea7;
         --segmentation: #2b8f8f;
 
-        --ink: #17171a;
-        --ink-soft: #52525b;
-        --paper: #fdfcf9;
-        --paper-raised: #ffffff;
-        --line: #e7e4db;
+        --ink: #f2f2f2;
+        --ink-soft: #9a9a9a;
+        --paper: #000000;
+        --paper-raised: #111111;
+        --line: #262626;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -209,7 +209,7 @@
 
     .finding p {
         font-size: 15.5px;
-        color: #33333a;
+        color: #c7c7c7;
         margin-bottom: 14px;
         max-width: 680px;
     }
@@ -238,20 +238,21 @@
         margin: 24px 0;
         padding: 20px 22px;
         border-left: 4px solid var(--guidance);
-        background: #fdf6e9;
+        background: rgba(217, 142, 31, 0.1);
         border-radius: 0 8px 8px 0;
         font-size: 15.5px;
+        color: #d8d8d8;
     }
 
-    .callout.c-personalization { border-color: var(--personalization); background: #eff7f1; }
-    .callout.c-coherence { border-color: var(--coherence); background: #f4f1f9; }
-    .callout.c-segmentation { border-color: var(--segmentation); background: #eaf6f6; }
+    .callout.c-personalization { border-color: var(--personalization); background: rgba(74, 143, 92, 0.12); }
+    .callout.c-coherence { border-color: var(--coherence); background: rgba(123, 94, 167, 0.12); }
+    .callout.c-segmentation { border-color: var(--segmentation); background: rgba(43, 143, 143, 0.12); }
 
     /* survey mini-stat bars */
     .mini-stats { display: flex; flex-direction: column; gap: 10px; margin: 22px 0; max-width: 680px; }
     .mini-stat-row { display: flex; align-items: center; gap: 12px; }
     .mini-stat-label { flex: 0 0 190px; font-size: 13.5px; color: var(--ink); }
-    .mini-stat-track { flex: 1; height: 10px; background: #efede5; border-radius: 5px; overflow: hidden; }
+    .mini-stat-track { flex: 1; height: 10px; background: #1a1a1a; border-radius: 5px; overflow: hidden; }
     .mini-stat-fill { height: 100%; border-radius: 5px; background: var(--guidance); }
     .mini-stat-pct { flex: 0 0 42px; text-align: right; font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft); }
 
@@ -285,7 +286,7 @@
     code {
         font-family: var(--font-mono);
         font-size: 0.93em;
-        background: #f1efe6;
+        background: #1c1c1c;
         padding: 1px 5px;
         border-radius: 4px;
     }
@@ -294,8 +295,8 @@
     .effect-list { display: flex; flex-direction: column; gap: 14px; margin: 24px 0; max-width: 680px; }
     .effect-row { display: grid; grid-template-columns: 140px 1fr 70px; align-items: center; gap: 10px; }
     .effect-name { font-size: 13.5px; font-weight: 600; }
-    .effect-track { position: relative; height: 22px; background: #efede5; border-radius: 4px; }
-    .effect-zero { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: #c9c5b8; }
+    .effect-track { position: relative; height: 22px; background: #1a1a1a; border-radius: 4px; }
+    .effect-zero { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: #444; }
     .effect-bar { position: absolute; top: 2px; bottom: 2px; border-radius: 3px; }
     .effect-val { font-family: var(--font-mono); font-size: 13px; text-align: right; }
 
@@ -303,7 +304,7 @@
     .predictor-list { display: flex; flex-direction: column; gap: 12px; margin: 24px 0; max-width: 680px; }
     .predictor-row { display: grid; grid-template-columns: 140px 1fr 70px; align-items: center; gap: 10px; }
     .predictor-name { font-size: 13.5px; }
-    .predictor-track { height: 10px; background: #efede5; border-radius: 5px; overflow: hidden; }
+    .predictor-track { height: 10px; background: #1a1a1a; border-radius: 5px; overflow: hidden; }
     .predictor-fill { height: 100%; border-radius: 5px; }
     .predictor-val { font-family: var(--font-mono); font-size: 12.5px; text-align: right; color: var(--ink-soft); }
 
@@ -340,8 +341,8 @@
     .cta-btn {
         display: inline-block;
         padding: 13px 28px;
-        background: var(--ink);
-        color: #fff;
+        background: #e8e8e8;
+        color: #0a0a0a;
         text-decoration: none;
         border-radius: 8px;
         font-size: 14.5px;
@@ -349,7 +350,7 @@
         transition: background 0.15s;
     }
 
-    .cta-btn:hover { background: #000; }
+    .cta-btn:hover { background: #ffffff; }
 
     footer {
         background: #050505;

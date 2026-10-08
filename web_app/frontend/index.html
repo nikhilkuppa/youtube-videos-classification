@@ -1,643 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Attention Trap in Online Education Videos</title>
-    <style>
-        :root {
-            /* Three deliberate stacks instead of one generic system list:
-               serif for the paper's own voice (title), sans for UI chrome,
-               mono for anything numeric (counts, stats) - a small nod to a
-               lab-instrument register rather than a SaaS dashboard. No
-               accent color: the only color in this app is the data itself,
-               so the interface stays entirely on a gray scale. */
-            --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-            --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-            --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: #000000;
-            color: #e0e0e0;
-            font-family: var(--font-sans);
-            overflow: hidden;
-        }
-
-        .app-container {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: #050505;
-            padding: 18px 0;
-            border-bottom: 1px solid #1c1c1c;
-        }
-
-        /* Flush to the viewport's right edge, same as .info-panel's own
-           right edge below it (.info-panel has no padding of its own -
-           .panel-section's 20px padding is inside it - so .info-panel's
-           scrollbar, when it has one, renders right at that flush edge,
-           not 20px in from it. Content's right edge lines up with that.
-           Left edge keeps the original 30px header padding. */
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 24px;
-            padding: 0 0 0 30px;
-        }
-
-        .header-text {
-            min-width: 0;
-        }
-
-        .eyebrow {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 1.6px;
-            text-transform: uppercase;
-            color: #6a6a6a;
-            margin-bottom: 4px;
-        }
-
-        .title {
-            font-size: 18px;
-            font-weight: 500;
-            letter-spacing: 0.1px;
-            color: #f2f2f2;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .byline {
-            font-size: 11.5px;
-            color: #777;
-            margin-top: 5px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .byline .sep {
-            color: #444;
-        }
-
-        #video-count {
-            font-family: var(--font-mono);
-        }
-
-        .byline a {
-            color: #999;
-            text-decoration: none;
-            border-bottom: 1px solid #444;
-            transition: color 0.15s, border-color 0.15s;
-        }
-
-        .byline a:hover {
-            color: #e0e0e0;
-            border-color: #999;
-        }
-
-        .classification-toggle {
-            display: flex;
-            gap: 2px;
-            background: #111;
-            padding: 3px;
-            border-radius: 7px;
-            border: 1px solid #222;
-            flex: 0 0 auto;
-        }
-
-        .toggle-btn {
-            padding: 7px 18px;
-            border: none;
-            background: transparent;
-            color: #777;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 13px;
-            font-weight: 500;
-            transition: background 0.15s, color 0.15s;
-        }
-
-        .toggle-btn.active {
-            background: #e8e8e8;
-            color: #0a0a0a;
-        }
-
-        .toggle-btn:hover:not(.active) {
-            background: #1e1e1e;
-            color: #ccc;
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            overflow: hidden;
-        }
-
-        .visualization-panel {
-            position: relative;
-            background: #000000;
-            flex: 0 0 auto;
-            height: 100%;
-            aspect-ratio: 1 / 1;
-            /* auto margins (not justify-content on the row) so the square
-               plot centers in the actual leftover space between the two
-               side panels, even though they're different widths (280px vs
-               400px) - justify-content:center would center the 3-item
-               group as a block instead, throwing the plot off-center. */
-            margin: 0 auto;
-        }
-
-        #canvas-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            cursor: grab;
-        }
-
-        #canvas-container.grabbing {
-            cursor: grabbing;
-        }
-
-        #tsne-canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* One joined bar, same visual language as the classification
-           toggle, instead of three separate floating glass pills. */
-        .controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 7px;
-            overflow: hidden;
-            z-index: 100;
-        }
-
-        .control-btn {
-            width: 36px;
-            height: 36px;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid #222;
-            color: #999;
-            font-family: var(--font-mono);
-            font-size: 15px;
-            cursor: pointer;
-            transition: background 0.15s, color 0.15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .control-btn:last-child {
-            border-bottom: none;
-        }
-
-        .control-btn:hover {
-            background: #1e1e1e;
-            color: #fff;
-        }
-
-        .info-panel {
-            width: 400px;
-            background: #151515;
-            border-left: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        /* Mirrors .info-panel on the other side of the plot - the legend
-           is reference material you check in on, not something that needs
-           to sit above the per-video info you're looking at constantly. */
-        .legend-panel {
-            width: 280px;
-            background: #151515;
-            border-right: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .panel-section {
-            padding: 20px;
-            border-bottom: 1px solid #222;
-        }
-
-        .panel-section h3 {
-            font-size: 14px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-        }
-
-        .video-embed {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .video-embed iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .thumbnail-preview {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #555;
-        }
-
-        .thumbnail-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .metadata {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .metadata-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .metadata-label {
-            font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .metadata-value {
-            font-size: 14px;
-            color: #ddd;
-            word-break: break-word;
-        }
-
-        .metadata-value a {
-            color: #ccc;
-            text-decoration: none;
-            border-bottom: 1px solid #444;
-        }
-
-        .metadata-value a:hover {
-            color: #fff;
-            border-color: #999;
-        }
-
-        .badge-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        /* Plain text chip, not a filled pill - the legend is where color
-           actually means something; here it would just be decoration. */
-        .category-badge {
-            display: inline-block;
-            padding: 2px 9px;
-            border: 1px solid #3a3a3a;
-            border-radius: 3px;
-            font-size: 11.5px;
-            color: #ccc;
-        }
-
-        .tag-path-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-top: 6px;
-        }
-
-        .tag-path {
-            font-size: 11px;
-            color: #999;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .tag-crumb {
-            white-space: nowrap;
-        }
-
-        .tag-crumb:last-child {
-            color: #ddd;
-        }
-
-        .tag-sep {
-            color: #555;
-        }
-
-        .stats-row {
-            display: flex;
-            gap: 15px;
-        }
-
-        .stat-item {
-            flex: 1;
-            background: #1a1a1a;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-family: var(--font-mono);
-            font-size: 16px;
-            font-weight: 600;
-            color: #f0f0f0;
-        }
-
-        .stat-label {
-            font-size: 10px;
-            color: #666;
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
-
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #2a2a2a;
-            border-top-color: #ccc;
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            margin-top: 20px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .placeholder {
-            color: #555;
-            font-size: 13px;
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .search-container {
-            padding: 15px 20px;
-            background: #1a1a1a;
-            border-bottom: 1px solid #222;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 10px 15px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #ddd;
-            font-size: 14px;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #777;
-        }
-
-        .video-count {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .legend-hint {
-            font-size: 10.5px;
-            color: #555;
-            margin-bottom: 8px;
-        }
-
-        .legend-list {
-            max-height: 220px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: #ccc;
-            padding: 3px 6px;
-            margin: 0 -6px;
-            border-radius: 5px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: background 0.15s, border-color 0.15s;
-        }
-
-        .legend-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
-        }
-
-        .legend-item.isolated {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-            color: #fff;
-        }
-
-        .legend-item.isolated .legend-name {
-            font-weight: 600;
-        }
-
-        .legend-swatch {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex: 0 0 auto;
-        }
-
-        .legend-name {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .legend-count {
-            font-family: var(--font-mono);
-            color: #666;
-            font-size: 11px;
-        }
-
-        .placeholder-inline {
-            color: #555;
-            font-size: 12px;
-        }
-
-        .legend-tooltip {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            background: #141414;
-            border: 1px solid #2a2a2a;
-            border-radius: 8px;
-            padding: 10px 12px;
-            min-width: 170px;
-            max-width: 260px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            pointer-events: none;
-        }
-
-        .legend-tooltip-header {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 12.5px;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #262626;
-        }
-
-        .legend-tooltip-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            font-size: 12px;
-            color: #ccc;
-            padding: 2px 0;
-        }
-
-        .legend-tooltip-count {
-            font-family: var(--font-mono);
-            color: #777;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Attention Trap in Online Education Videos</title>
+<link rel="stylesheet" href="findings.css">
 </head>
 <body>
-    <div class="app-container">
-        <div class="header">
-            <div class="header-content">
-                <div class="header-text">
-                    <div class="eyebrow">An interactive exploration of the online video landscape</div>
-                    <div class="title">The Attention Trap in Online Education Videos</div>
-                    <div class="byline">
-                        <span>Nikhil Kuppa, Melanie Adler, Lucas C. Parra, Jens Madsen</span>
-                        <span class="sep">&middot;</span>
-                        <!-- once published, set href to the real DOI URL and add target="_blank" rel="noopener" -->
-                        <a id="doi-link" href="javascript:void(0)">DOI: pending</a>
-                        <span class="sep">&middot;</span>
-                        <span id="video-count">Loading&hellip;</span>
-                    </div>
-                </div>
-                <div class="classification-toggle">
-                    <button class="toggle-btn active" data-classification="format">Format</button>
-                    <button class="toggle-btn" data-classification="content">Content</button>
-                </div>
+
+<div class="header">
+    <div class="header-content">
+        <div class="header-text">
+            <div class="eyebrow">What the four studies found</div>
+            <div class="title">The Attention Trap in Online Education Videos</div>
+            <div class="byline">
+                <span>Nikhil Kuppa, Melanie Adler, Lucas C. Parra, Jens Madsen</span>
+                <span class="sep">&middot;</span>
+                <a href="javascript:void(0)">DOI: pending</a>
             </div>
         </div>
-
-        <div class="main-content">
-            <div class="legend-panel">
-                <div class="panel-section">
-                    <h3>Legend</h3>
-                    <div class="legend-hint">Hover to preview &middot; click to isolate</div>
-                    <div class="legend-list" id="legend-list"></div>
-                </div>
-            </div>
-
-            <div class="visualization-panel">
-                <div id="canvas-container">
-                    <canvas id="tsne-canvas"></canvas>
-                    <div class="loading" id="loading">
-                        <div class="loading-spinner"></div>
-                        <div class="loading-text">Loading visualization...</div>
-                    </div>
-                </div>
-                <div class="controls">
-                    <button class="control-btn" id="zoom-in" title="Zoom In">+</button>
-                    <button class="control-btn" id="zoom-out" title="Zoom Out">−</button>
-                    <button class="control-btn" id="reset-view" title="Reset View">⟲</button>
-                </div>
-            </div>
-
-            <div class="info-panel">
-                <div class="search-container">
-                    <input type="text" class="search-input" id="search-input" placeholder="Search videos, channels, categories...">
-                </div>
-
-                <div class="panel-section">
-                    <h3>On Hover</h3>
-                    <div class="thumbnail-preview" id="thumbnail-preview">
-                        <div class="placeholder">Hover over a dot</div>
-                    </div>
-                    <div class="metadata" id="hover-metadata">
-                        <div class="placeholder">Hover over a dot to see details</div>
-                    </div>
-                </div>
-
-                <div class="panel-section">
-                    <h3>Selected Video</h3>
-                    <div class="video-embed" id="video-embed">
-                        <div class="placeholder">Click a dot to play video</div>
-                    </div>
-                    <div class="metadata" id="selected-metadata">
-                        <div class="placeholder">Click a dot to see details</div>
-                    </div>
-                </div>
-            </div>
+        <div class="page-nav">
+            <a href="index.html" class="active">Findings</a>
+            <a href="supplementary.html">Supplementary</a>
+            <a href="explore.html">Explore the data</a>
         </div>
     </div>
+</div>
 
-    <div class="legend-tooltip" id="legend-tooltip"></div>
+<div class="hero">
+    <div class="hero-kicker">Four studies &middot; 1,378 + 570 students &middot; 63,505 videos</div>
+    <h1>Students rely on online video for real coursework. The videos that reach them most aren't chosen for how well they teach.</h1>
+    <p>
+        We asked whether the instructional design of an educational video predicts two different
+        things: whether students learn from it, and whether it gets watched. Across a student survey,
+        a 63,505-video corpus, a 570-student learning experiment and a platform-wide viewership model,
+        the answer was the same: these two questions have different answers.
+    </p>
+</div>
 
-    <script src="app.js"></script>
+<nav class="section-nav" id="section-nav">
+    <a href="#survey">Survey</a>
+    <a href="#corpus">Corpus</a>
+    <a href="#metrics">Metrics</a>
+    <a href="#experiment">Experiment</a>
+    <a href="#wmc">Working memory</a>
+    <a href="#viewership">Viewership</a>
+    <a href="#discussion">Discussion</a>
+</nav>
+
+<div class="stat-strip">
+    <div class="stat"><div class="stat-num">1,378</div><div class="stat-label">students surveyed on coursework help-seeking</div></div>
+    <div class="stat"><div class="stat-num">63,505</div><div class="stat-label">educational videos mapped &amp; scored</div></div>
+    <div class="stat"><div class="stat-num">570</div><div class="stat-label">students in the pre-registered learning experiment</div></div>
+    <div class="stat"><div class="stat-num">64.5B</div><div class="stat-label">total views across the corpus</div></div>
+</div>
+
+<!-- Study 1 -->
+<section class="finding" id="survey">
+    <div class="finding-kicker" style="background:#fdf6e9;color:var(--guidance)">Study 1 &middot; Survey</div>
+    <h2>Online video is now a mainstream coursework resource, and students say they pick videos partly for pedagogical reasons</h2>
+    <p>
+        In a survey of 1,378 students, YouTube or other educational video platforms were among the
+        most frequently used coursework-help resources (43.3%), more commonly selected than
+        classmates (37.3%) or professors (31.0%). The most common goals were to <strong>understand the
+        material deeply</strong> (58.7%), prepare for an exam (53.6%) and complete a specific assignment
+        (51.8%).
+    </p>
+    <p>
+        When asked what makes them more likely to pick a video, students cited both learning-design
+        cues and platform cues, in close to equal measure:
+    </p>
+    <div class="mini-stats">
+        <div class="mini-stat-row"><div class="mini-stat-label">Highlights key ideas</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:53.7%;background:var(--guidance)"></div></div><div class="mini-stat-pct">53.7%</div></div>
+        <div class="mini-stat-row"><div class="mini-stat-label">Conversational style</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:51.6%;background:var(--personalization)"></div></div><div class="mini-stat-pct">51.6%</div></div>
+        <div class="mini-stat-row"><div class="mini-stat-label">Avoids distractions</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:51.6%;background:var(--coherence)"></div></div><div class="mini-stat-pct">51.6%</div></div>
+        <div class="mini-stat-row"><div class="mini-stat-label">Clearly divided into sections</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:51.6%;background:var(--segmentation)"></div></div><div class="mini-stat-pct">51.6%</div></div>
+        <div class="mini-stat-row"><div class="mini-stat-label">Trusted channel</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:47.3%;background:#8a867a"></div></div><div class="mini-stat-pct">47.3%</div></div>
+        <div class="mini-stat-row"><div class="mini-stat-label">Short duration</div><div class="mini-stat-track"><div class="mini-stat-fill" style="width:45.9%;background:#8a867a"></div></div><div class="mini-stat-pct">45.9%</div></div>
+    </div>
+    <p>
+        That students weigh both kinds of cues side by side is the question the rest of the paper
+        follows: do the instructional features they value actually predict learning, and do those
+        same features predict which videos get watched?
+    </p>
+    <figure>
+        <img src="assets/figures/fig1-survey.png" alt="Figure 1: coursework help sources, goals, reasons for using video, and video selection features, from a 1,378-student survey.">
+        <figcaption><b>Fig. 1.</b> Coursework help sources and goals (a, b), reasons and situations for choosing video (c, d), and the features that make students more likely to select a video (e). Green = learning-design features, orange = surface/platform features. N = 1,372&ndash;1,378 per panel.</figcaption>
+    </figure>
+</section>
+
+<!-- Study 2 -->
+<section class="finding" id="corpus">
+    <div class="finding-kicker" style="background:#eaf6f6;color:var(--segmentation)">Study 2 &middot; Corpus mapping</div>
+    <h2>The educational video landscape is enormous, and attention is not spread evenly across it</h2>
+    <p>
+        We built a corpus of <strong>63,505 educational videos</strong> spanning <strong>20.7 thousand
+        hours</strong> and <strong>64.5 billion views</strong>, classified by topic (physical sciences,
+        mathematics, biological sciences, law, humanities, social sciences, engineering, health,
+        business, education, architecture, languages, the arts, and more) and by presentation format
+        (talking-head, infographic, documentary, animation, writing-cursor tutorial, stage talk,
+        lecture, demonstration, interview, slide deck, screencast, panel discussion).
+    </p>
+    <p>
+        Viewership was not evenly distributed across this space. Some topic&ndash;format combinations,
+        such as talking-head videos on law, drew substantially more views than others covering the
+        same material in a different format.
+    </p>
+    <figure>
+        <img src="assets/figures/fig2-dataset.png" alt="Figure 2: classification pipeline, t-SNE map of 63,505 videos by topic, and a topic-by-format viewership heatmap.">
+        <figcaption><b>Fig. 2.</b> a, Classification pipeline: transcripts are scored by a large language model against a structured topic/format taxonomy. b, 63,505 videos embedded and colored by topic. c, Mean log&#8321;&#8320; views per topic&times;format combination.</figcaption>
+    </figure>
+</section>
+
+<!-- Metrics -->
+<section class="finding" id="metrics">
+    <div class="finding-kicker" style="background:#f4f1f9;color:var(--coherence)">Study 2 &middot; Four instructional metrics</div>
+    <h2>We scored every video on four dimensions drawn from multimedia-learning theory</h2>
+    <p>
+        Coherence, segmentation, guidance and personalization are instructional-design principles that
+        have been studied in controlled lab settings but rarely measured at the scale of an actual video
+        platform. We computed all four from each video's transcript across all 63,505 videos: coherence
+        and segmentation from sentence-embedding structure, guidance and personalization via structured
+        large-language-model scoring.
+    </p>
+    <div class="metric-grid">
+        <div class="metric-card guidance">
+            <h3>Guidance</h3>
+            <p>Does the video direct attention to what matters: highlighting key ideas, signalling structure, introducing concepts before using them?</p>
+        </div>
+        <div class="metric-card personalization">
+            <h3>Personalization</h3>
+            <p>How conversational the explanation is: direct address, contractions, natural spoken language versus formal, academic delivery.</p>
+        </div>
+        <div class="metric-card coherence">
+            <h3>Coherence</h3>
+            <p>How tightly the explanation stays centered on one topic, measured from sentence-to-sentence semantic continuity.</p>
+        </div>
+        <div class="metric-card segmentation">
+            <h3>Segmentation</h3>
+            <p>How clearly the video is divided into distinct, balanced sections, detected from shifts in topic structure across the transcript.</p>
+        </div>
+    </div>
+    <p>
+        Before using these metrics for anything, we checked that they tracked what viewers actually
+        noticed. Guidance was positively associated with viewers' ratings of clear organization and
+        highlighted key ideas; personalization was associated with step-by-step clarity and perceived
+        learning; coherence showed a more complex profile, also correlating with higher reported
+        cognitive load.
+    </p>
+    <figure>
+        <img src="assets/figures/fig3-metrics.png" alt="Figure 3: metric construction pipeline, correlations among subjective ratings, and correlations between computational metrics and subjective ratings.">
+        <figcaption><b>Fig. 3.</b> a, Metric-construction and video-selection pipeline (40 videos, 5 high/5 low per dimension). b, Correlations among viewers' subjective ratings. c, Correlations between the four computational metrics and mean subjective ratings.</figcaption>
+    </figure>
+</section>
+
+<!-- Study 3 -->
+<section class="finding" id="experiment">
+    <div class="finding-kicker" style="background:#fdf6e9;color:var(--guidance)">Study 3 &middot; Learning experiment</div>
+    <h2>Guidance improved memory. Segmentation made it worse.</h2>
+    <p>
+        570 students watched videos selected to be high or low on one of the four metrics, topic-matched
+        in pairs, then completed a quiz immediately and again seven days later. The four dimensions did
+        not behave the same way.
+    </p>
+    <div class="effect-list">
+        <div class="effect-row">
+            <div class="effect-name" style="color:var(--guidance)">Guidance</div>
+            <div class="effect-track"><div class="effect-zero"></div><div class="effect-bar" style="left:50%;width:15%;background:var(--guidance)"></div></div>
+            <div class="effect-val">+5.2 pp</div>
+        </div>
+        <div class="effect-row">
+            <div class="effect-name" style="color:var(--personalization)">Personalization</div>
+            <div class="effect-track"><div class="effect-zero"></div><div class="effect-bar" style="left:50%;width:11%;background:var(--personalization)"></div></div>
+            <div class="effect-val">+3.8 pp</div>
+        </div>
+        <div class="effect-row">
+            <div class="effect-name" style="color:var(--coherence)">Coherence</div>
+            <div class="effect-track"><div class="effect-zero"></div><div class="effect-bar" style="left:50%;width:1.5%;background:var(--coherence)"></div></div>
+            <div class="effect-val">+0.5 pp</div>
+        </div>
+        <div class="effect-row">
+            <div class="effect-name" style="color:var(--segmentation)">Segmentation</div>
+            <div class="effect-track"><div class="effect-zero"></div><div class="effect-bar" style="left:41%;width:9%;background:var(--segmentation)"></div></div>
+            <div class="effect-val">&minus;3.0 pp</div>
+        </div>
+    </div>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-10px">Immediate quiz, high-scoring minus low-scoring videos, percentage points.</p>
+    <div class="callout">
+        <strong>Guidance</strong> was the most consistently beneficial dimension: +5.2 percentage points
+        on the immediate quiz, and the effect held up a week later (+3.7 pp delayed).
+    </div>
+    <div class="callout c-personalization">
+        <strong>Personalization</strong> helped immediately (+3.8 pp) but the benefit mostly disappeared
+        by the delayed quiz (&minus;0.8 pp). A conversational style may aid comprehension in the
+        moment without producing durable retention.
+    </div>
+    <div class="callout c-segmentation">
+        <strong>Segmentation</strong> was the exception that didn't help: &minus;3.0 pp immediately, and
+        the gap widened to &minus;6.6 pp after a week. In naturally occurring videos, high computationally-detected
+        segmentation did not translate into the memory benefit it produces in controlled instructional materials.
+    </div>
+    <figure>
+        <img src="assets/figures/fig4-quiz.png" alt="Figure 4: difference in delayed and immediate quiz performance between high- and low-scoring videos, for each of the four instructional dimensions.">
+        <figcaption><b>Fig. 4.</b> Difference in quiz performance (high minus low) for each instructional dimension, at the delayed (a) and immediate (b) time point.</figcaption>
+    </figure>
+</section>
+
+<!-- Working memory -->
+<section class="finding" id="wmc">
+    <div class="finding-kicker" style="background:#eaf6f6;color:var(--segmentation)">Study 3 &middot; Working memory</div>
+    <h2>Segmentation hurt low-working-memory students most, and the advantage of high capacity faded after a week</h2>
+    <p>
+        Participants also completed a digit-span working memory capacity (WMC) task. Highly segmented
+        videos impaired quiz performance across all capacity groups, but not equally.
+    </p>
+    <table class="wmc-table">
+        <tr><th>WMC group</th><th>Immediate quiz (high &minus; low seg.)</th><th>Delayed quiz (high &minus; low seg.)</th></tr>
+        <tr><td>Low WMC</td><td class="num">&minus;7.8 pp</td><td class="num">&minus;8.2 pp</td></tr>
+        <tr><td>Mean WMC</td><td class="num">&minus;3.5 pp</td><td class="num">&minus;7.3 pp</td></tr>
+        <tr><td>High WMC</td><td class="num">+0.9 pp</td><td class="num">&minus;6.3 pp</td></tr>
+    </table>
+    <p>
+        On the immediate quiz, high-WMC students were essentially unaffected by segmentation (+0.9 pp),
+        while low-WMC students lost 7.8 percentage points. A week later, though, performance had dropped
+        across every capacity group, including high-WMC students. The short-term advantage of
+        higher working memory did not carry over to long-term retention.
+    </p>
+</section>
+
+<!-- Study 4 -->
+<section class="finding" id="viewership">
+    <div class="finding-kicker" style="background:#f6efe3;color:#8a5a1f">Study 4 &middot; Platform viewership</div>
+    <h2>The attention trap: channel reach, not instructional design, determines what gets watched</h2>
+    <p>
+        If online attention tracked pedagogical quality, instructional design should explain a
+        meaningful share of why some educational videos get more views than others. We fit a model of
+        video viewership using channel reach (subscriber count, channel video count), video form (age,
+        duration), attention features (word rate, visual cut rate) and all four instructional metrics,
+        then measured how much predictive power was lost when each block was removed.
+    </p>
+    <div class="predictor-list">
+        <div class="predictor-row"><div class="predictor-name">Channel reach</div><div class="predictor-track"><div class="predictor-fill" style="width:100%;background:#2b2b2b"></div></div><div class="predictor-val">0.4258</div></div>
+        <div class="predictor-row"><div class="predictor-name">Attention features</div><div class="predictor-track"><div class="predictor-fill" style="width:9%;background:#8a867a"></div></div><div class="predictor-val">0.0095</div></div>
+        <div class="predictor-row"><div class="predictor-name">Guidance</div><div class="predictor-track"><div class="predictor-fill" style="width:5%;background:var(--guidance)"></div></div><div class="predictor-val">0.0053</div></div>
+        <div class="predictor-row"><div class="predictor-name">Video form</div><div class="predictor-track"><div class="predictor-fill" style="width:3%;background:#8a867a"></div></div><div class="predictor-val">0.0032</div></div>
+        <div class="predictor-row"><div class="predictor-name">Personalization</div><div class="predictor-track"><div class="predictor-fill" style="width:0.6%;background:var(--personalization)"></div></div><div class="predictor-val">0.0006</div></div>
+        <div class="predictor-row"><div class="predictor-name">Coherence</div><div class="predictor-track"><div class="predictor-fill" style="width:0.4%;background:var(--coherence)"></div></div><div class="predictor-val">0.0004</div></div>
+        <div class="predictor-row"><div class="predictor-name">Segmentation</div><div class="predictor-track"><div class="predictor-fill" style="width:0.2%;background:var(--segmentation)"></div></div><div class="predictor-val">0.0002</div></div>
+    </div>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-top:-10px">Change in adjusted R&sup2; when each predictor block is removed from the full viewership model.</p>
+    <p>
+        Removing channel reach alone cost the model 0.43 in adjusted R&sup2;, more than
+        <strong>80 times</strong> the loss from removing guidance (0.005), the strongest instructional
+        predictor, and hundreds of times the loss from removing coherence or segmentation individually.
+    </p>
+    <figure>
+        <img src="assets/figures/fig6-viewership.png" alt="Figure 6: predictors of educational video viewership, showing channel reach dominating over instructional metrics by orders of magnitude on a log scale.">
+        <figcaption><b>Fig. 6.</b> Change in adjusted R&sup2; when each predictor or predictor block is removed from the full viewership model. Log-scaled y-axis to show predictors spanning orders of magnitude.</figcaption>
+    </figure>
+    <p>
+        A well-designed video from a less visible channel may therefore be less likely to reach
+        students than a less effective video from a prominent channel. Online attention and
+        instructional quality are not the same signal, and the platform does not treat them as one.
+    </p>
+</section>
+
+<!-- Discussion -->
+<section class="finding" id="discussion">
+    <div class="finding-kicker" style="background:rgba(123,94,167,0.14);color:var(--coherence)">Discussion</div>
+    <h2>Online educational video sits at the intersection of two systems built for different purposes</h2>
+    <p>
+        Students use these videos to resolve confusion, prepare for exams and find explanations that
+        make difficult material easier to grasp. For platforms, visibility of the same videos is
+        governed by channel reach, recommendation algorithms, production style and accumulated
+        attention. A video can be easy to find and widely watched without being the one that best
+        supports learning.
+    </p>
+    <p>
+        The results argue against a simple checklist view of instructional design. Guidance improved
+        both immediate and delayed memory. Personalization helped immediately but the benefit mostly
+        disappeared after a week. Coherence showed little effect in the selected video set, and
+        segmentation was associated with poorer delayed memory. In naturally occurring videos,
+        instructional principles are expressed through varied combinations of content, pacing and
+        production choices, and not all of those expressions are beneficial.
+    </p>
+    <p>
+        Because platform cues signal popularity rather than pedagogy, students cannot reasonably be
+        expected to select videos by instructional quality alone. Instructors can reduce this burden by
+        curating videos and embedding them in instructional sequences. Platforms and educational
+        technology systems could go further by treating instructional design as a ranking signal
+        alongside engagement and reach.
+    </p>
+    <p>
+        This study also has real limits. Instructional quality is not a single scalar property of a
+        video; it depends on content, design, learner characteristics and outcome. The four metrics used
+        here leave out visual and interactional features of instruction, including gesture, diagram
+        quality and animation dynamics, and an external benchmark against one human-annotated dataset
+        showed only weak agreement (Supplementary Note 3). Future work should connect actual student
+        search behavior to learning outcomes and incorporate richer multimodal measures.
+    </p>
+</section>
+
+<div class="cta">
+    <h2>See where any one of the 63,505 videos sits</h2>
+    <p>The full corpus, mapped by topic or format and colored by category, is browsable directly: hover any point for its title, channel and instructional-metric scores.</p>
+    <a class="cta-btn" href="explore.html">Explore the corpus &rarr;</a>
+</div>
+
+<footer>
+    <div class="footer-inner">
+        <div class="footer-col">
+            <h4>Paper</h4>
+            <div>Nikhil Kuppa, Melanie Adler, Lucas C. Parra, Jens Madsen</div>
+            <div>Department of Biomedical Engineering, City College of New York</div>
+        </div>
+        <div class="footer-col">
+            <h4>Code</h4>
+            <div><a href="https://github.com/nikhilkuppa/attention-trap" target="_blank" rel="noopener">attention-trap</a>: figures &amp; analysis</div>
+        </div>
+        <div class="footer-col">
+            <h4>More</h4>
+            <div><a href="supplementary.html">Supplementary methods &amp; validation</a></div>
+            <div><a href="explore.html">Interactive video corpus map</a></div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Highlights the section-nav pill for whichever section is currently in
+    // view, and also snaps to the clicked pill immediately on click rather
+    // than waiting for the scroll to catch up.
+    (function () {
+        const nav = document.getElementById('section-nav');
+        if (!nav) return;
+        const links = Array.from(nav.querySelectorAll('a'));
+        const sections = links
+            .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+            .filter(Boolean);
+
+        function setActive(id) {
+            links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+        }
+
+        links.forEach(a => {
+            a.addEventListener('click', () => setActive(a.getAttribute('href').slice(1)));
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            const visible = entries.filter(e => e.isIntersecting);
+            if (visible.length) {
+                visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+                setActive(visible[0].target.id);
+            }
+        }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+
+        sections.forEach(s => observer.observe(s));
+    })();
+</script>
+
 </body>
 </html>
